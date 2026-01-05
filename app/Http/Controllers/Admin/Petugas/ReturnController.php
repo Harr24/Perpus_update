@@ -13,7 +13,7 @@ use App\Models\BookCopy;
 class ReturnController extends Controller
 {
     /**
-     * Menampilkan daftar buku yang sedang dipinjam, dengan fungsionalitas PENCARIAN.
+     * Menampilkan daftar buku yang sedang dipinjam, dengan fungsionalitas PeENCARIAN.
      */
     public function index(Request $request)
     {
