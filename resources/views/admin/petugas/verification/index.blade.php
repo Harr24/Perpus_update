@@ -1,275 +1,168 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verifikasi Pendaftar</title>
+@extends('layouts.admin')
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section('content')
+    {{-- Header Halaman --}}
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Verifikasi Pendaftar</h2>
+            <p class="text-gray-500 mt-1 font-medium">Tinjau dan setujui akun siswa baru yang mendaftar di sistem.</p>
+        </div>
+        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+            <span>⬅️</span> Kembali
+        </a>
+    </div>
 
-<style>
- /* [ SELURUH KODE CSS KAMU YANG SUDAH ADA DI SINI, TIDAK ADA YANG DIUBAH ] */
- body {
- font-family: 'Segoe UI', Tahoma, sans-serif;
- background: #f9fafb;
- margin: 0;
- padding: 20px;
- color: #333;
- }
- .header-container {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 20px;
- flex-wrap: wrap;
- gap: 15px;
- }
- h1 {
- font-size: 1.8rem;
- margin: 0;
- color: #c62828;
- }
- .btn-back {
- padding: 8px 14px;
- border: 1px solid #ddd;
- border-radius: 6px;
- font-weight: 600;
- cursor: pointer;
- font-size: 0.9rem;
- text-decoration: none;
- background-color: #fff;
- color: #555;
- transition: background-color 0.2s, border-color 0.2s;
- }
- .btn-back:hover {
- background-color: #f3f4f6;
- border-color: #ccc;
- }
- .alert-success, .alert-error {
- padding: 12px 16px;
- border-radius: 6px;
- margin-bottom: 16px;
- font-weight: 500;
- }
- .alert-success {
- background-color: #e6f4ea;
- color: #2e7d32;
- border-left: 4px solid #2e7d32;
- }
- .alert-error {
- background-color: #fdecea;
- color: #c62828;
- border-left: 4px solid #c62828;
- }
- table {
- width: 100%;
- border-collapse: collapse;
- background: #fff;
- box-shadow: 0 2px 6px rgba(0,0,0,0.05);
- border-radius: 6px;
- overflow: hidden;
- }
- th, td {
- padding: 12px 16px;
- border-bottom: 1px solid #eee;
- text-align: left;
- }
- td a {
- color: #c62828;
- text-decoration: none;
- font-weight: 600;
- }
- td a:hover {
- text-decoration: underline;
- }
- th {
- background-color: #f3f4f6;
- font-size: 0.9rem;
- text-transform: uppercase;
- color: #555;
- }
- td {
- font-size: 0.95rem;
- }
- td span {
- font-style: italic;
- color: #888;
- }
- .actions {
- display: flex;
- gap: 8px;
- flex-wrap: wrap;
- }
- .btn-approve, .btn-reject {
- padding: 6px 12px;
- border: none;
- border-radius: 4px;
- font-weight: 600;
- cursor: pointer;
- font-size: 0.85rem;
- }
- .btn-approve {
- background-color: #2e7d32;
- color: #fff;
- }
- .btn-reject {
- background-color: #c62828;
- color: #fff;
- }
- @media (max-width: 600px) {
- table, thead, tbody, th, td, tr {
-  display: block;
- }
- thead {
-  display: none;
- }
- tr {
-  margin-bottom: 16px;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  padding: 12px;
- }
- td {
-  border: none;
-  padding: 8px 0;
- }
- td::before {
-  content: attr(data-label);
-  font-weight: 600;
-  display: block;
-  margin-bottom: 4px;
-  color: #555;
- }
- .actions {
-  flex-direction: column;
- }
- }
-</style>
-</head>
-<body>
+    {{-- Alert Notifikasi --}}
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+            <span class="text-xl">✅</span> {{ session('success') }}
+        </div>
+    @endif
 
-<div class="header-container">
- <h1>Daftar Siswa Menunggu Verifikasi</h1>
- <a href="{{ route('dashboard') }}" class="btn-back">Kembali ke Dashboard</a>
-</div>
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-rose-50 text-rose-700 border border-rose-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+            <span class="text-xl">⚠️</span> {{ session('error') }}
+        </div>
+    @endif
 
-@if(session('success'))
- <div class="alert-success">{{ session('success') }}</div>
-@endif
+    {{-- Tabel Verifikasi --}}
+    <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50/50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Nama & Email</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">NISN</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Kelas</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Kartu Pelajar</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Aksi Verifikasi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($pendingUsers as $student)
+                        <tr class="hover:bg-gray-50/50 transition duration-200">
 
-@if(session('error'))
- <div class="alert-error">{{ session('error') }}</div>
-@endif
+                            {{-- Nama dan Email --}}
+                            <td class="px-6 py-4">
+                                <h4 class="text-sm font-bold text-gray-900">{{ $student->name }}</h4>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ $student->email }}</p>
+                            </td>
 
-<table>
- <thead>
- <tr>
-  <th>Nama</th>
-  <th>NISN</th> 
-  <th>Email</th>
-  <th>Kelas</th>
-  <th>Kartu Pelajar</th>
-  <th>Aksi</th>
- </tr>
- </thead>
- <tbody>
- @forelse ($pendingUsers as $student)
-  <tr>
-  <td data-label="Nama">{{ $student->name }}</td>
-  <td data-label="NISN">{{ $student->nis ?? 'N/A' }}</td>
-  <td data-label="Email">{{ $student->email }}</td>
+                            {{-- NISN --}}
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold font-mono border border-gray-200">
+                                    {{ $student->nis ?? 'N/A' }}
+                                </span>
+                            </td>
 
-  {{-- ========================================================== --}}
-  {{-- --- 🔥 INI DIA PERBAIKANNYA 🔥 --- --}}
-  {{-- Kita gabungkan $student->class dan $student->major --}}
-  {{-- ========================================================== --}}
-  <td data-label="Kelas">{{ $student->class }} {{ $student->major }}</td>
-  {{-- ========================================================== --}}
+                            {{-- Kelas & Jurusan --}}
+                            <td class="px-6 py-4 text-sm font-bold text-gray-700">
+                                {{ $student->class }} {{ $student->major }}
+                            </td>
 
-  <td data-label="Kartu Pelajar">
-   @if($student->student_card_photo)
-   <a href="{{ Storage::url($student->student_card_photo) }}" target="_blank">Lihat Foto</a>
-   @else
-   <span>Belum ada foto</span>
-   @endif
-  </td>
-  <td data-label="Aksi">
-   <div class="actions">
+                            {{-- Foto Kartu Pelajar --}}
+                            <td class="px-6 py-4 text-center">
+                                @if($student->student_card_photo)
+                                    <a href="{{ Storage::url($student->student_card_photo) }}" target="_blank"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition border border-blue-100">
+                                        <span>📸</span> Lihat Foto
+                                    </a>
+                                @else
+                                    <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-400 rounded-lg text-xs font-bold border border-gray-100 italic">
+                                        Kosong
+                                    </span>
+                                @endif
+                            </td>
 
-   <form action="{{ route('admin.petugas.verification.approve', $student) }}" method="POST" class="form-confirm-acc">
-    @csrf
-    <button type="submit" class="btn-approve">ACC</button>
-   </form>
-   
-   {{-- Saya tambahkan konfirmasi untuk Tolak juga --}}
-   <form action="{{ route('admin.petugas.verification.reject', $student) }}" method="POST" class="form-confirm-reject">
-    @csrf
-    <button type="submit" class="btn-reject">Tolak</button>
-   </form>
-   </div>
-  </td>
-  </tr>
- @empty
-  <tr>
-  <td colspan="6">Tidak ada pendaftar baru.</td>
-  </tr>
- @endforelse
- </tbody>
-</table>
+                            {{-- Tombol Aksi (ACC / Tolak) --}}
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    {{-- Form ACC --}}
+                                    <form action="{{ route('admin.petugas.verification.approve', $student) }}" method="POST" class="form-confirm-acc m-0">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg text-xs font-bold transition shadow-sm">
+                                            ✅ Setujui
+                                        </button>
+                                    </form>
 
+                                    {{-- Form Tolak --}}
+                                    <form action="{{ route('admin.petugas.verification.reject', $student) }}" method="POST" class="form-confirm-reject m-0">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition border border-rose-100 shadow-sm">
+                                            ❌ Tolak
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-16 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <span class="text-4xl mb-3">😴</span>
+                                    <h3 class="text-lg font-bold text-gray-900">Belum ada pendaftar baru</h3>
+                                    <p class="text-gray-500 mt-1">Saat ini tidak ada siswa yang menunggu untuk diverifikasi.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endsection
 
-<script>
-  // Logika untuk tombol SETUJU (ACC)
-  // 1. Ambil semua form dengan class 'form-confirm-acc'
-  const accForms = document.querySelectorAll('.form-confirm-acc');
-  
-  // 2. Beri event listener ke setiap form
-  accForms.forEach(form => {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault(); // Hentikan form agar tidak langsung submit
-      
-      Swal.fire({
-        title: 'Setujui Siswa Ini?',
-        text: "Apakah Anda yakin data siswa ini sudah benar?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#2e7d32', // Warna dari .btn-approve
-        cancelButtonColor: '#555',
-        confirmButtonText: 'Ya, Setujui!',
-        cancelButtonText: 'Batal'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          form.submit(); // Jika dikonfirmasi, lanjutkan submit form
-        }
-      });
-    });
-  });
+@push('scripts')
+    {{-- Memastikan SweetAlert dimuat --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-  // Logika untuk tombol TOLAK
-  const rejectForms = document.querySelectorAll('.form-confirm-reject');
-  rejectForms.forEach(form => {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault(); // Hentikan submit
-      
-      Swal.fire({
-        title: 'Tolak Siswa Ini?',
-        text: "Tindakan ini tidak dapat dibatalkan.",
-      _message: "Tindakan ini tidak dapat dibatalkan.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#c62828', // Warna dari .btn-reject
-        cancelButtonColor: '#555',
-        confirmButtonText: 'Ya, Tolak!',
-        cancelButtonText: 'Batal'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          form.submit(); // Lanjutkan submit jika dikonfirmasi
-        }
-      });
-    });
-  });
-</script>
+            // Logika Konfirmasi ACC
+            const accForms = document.querySelectorAll('.form-confirm-acc');
+            accForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Setujui Pendaftar?',
+                        text: "Pastikan data NISN dan Kelas sudah sesuai.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#059669', // Emerald-600
+                        cancelButtonColor: '#6b7280', // Gray-500
+                        confirmButtonText: 'Ya, Setujui!',
+                        cancelButtonText: 'Batal',
+                        borderRadius: '1.5rem' // Biar agak membulat
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
 
-</body>
-</html>
+            // Logika Konfirmasi Tolak
+            const rejectForms = document.querySelectorAll('.form-confirm-reject');
+            rejectForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Tolak Pendaftar?',
+                        text: "Tindakan ini akan menghapus data pendaftaran siswa.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e11d48', // Rose-600
+                        cancelButtonColor: '#6b7280', // Gray-500
+                        confirmButtonText: 'Ya, Tolak!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+        });
+    </script>
+@endpush

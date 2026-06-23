@@ -1,168 +1,161 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4 py-4">
-    {{-- Bagian Header --}}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <h1 class="h3 fw-bold mb-2" style="color: #d9534f;">Kelola Pengajuan Pinjaman</h1>
-                    <p class="text-muted mb-0 small">Daftar pengajuan peminjaman buku yang menunggu konfirmasi.</p>
-                </div>
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-                </a>
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Kelola Pengajuan Pinjaman</h2>
+                <p class="text-gray-500 mt-1 font-medium">Daftar pengajuan peminjaman buku yang menunggu konfirmasi.</p>
             </div>
+            <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl font-semibold text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Dashboard
+            </a>
         </div>
     </div>
 
     {{-- Notifikasi Sukses atau Error --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center">
+            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="font-medium">{{ session('success') }}</span>
         </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center">
+            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            <span class="font-medium">{{ session('error') }}</span>
         </div>
     @endif
 
-    {{-- Form untuk Aksi Massal --}}
-    <form action="{{ route('admin.petugas.approvals.approveMultiple') }}" method="POST" id="bulk-approve-form">
-        @csrf
-    </form>
-    
-    <form action="{{ route('admin.petugas.approvals.rejectMultiple') }}" method="POST" id="bulk-reject-form" onsubmit="return confirm('Anda yakin ingin MENOLAK semua pengajuan yang dipilih?');">
-        @csrf
-    </form>
+    {{-- Form untuk Aksi Massal (Hidden) --}}
+    <form action="{{ route('admin.petugas.approvals.approveMultiple') }}" method="POST" id="bulk-approve-form">@csrf</form>
+    <form action="{{ route('admin.petugas.approvals.rejectMultiple') }}" method="POST" id="bulk-reject-form" onsubmit="return confirm('Anda yakin ingin MENOLAK semua pengajuan yang dipilih?');">@csrf</form>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom py-3">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="bi bi-clock-history me-2 text-warning"></i>
-                    Peminjaman Menunggu Konfirmasi
-                    <span class="badge bg-warning text-dark ms-2">{{ $pendingBorrowings->count() }}</span>
-                </h5>
-                
-                {{-- FORM PENCARIAN --}}
-                <form action="{{ route('admin.petugas.approvals.index') }}" method="GET" class="d-flex w-100 w-md-auto">
-                    <div class="input-group input-group-sm">
-                        <input type="search" name="search" class="form-control" placeholder="Cari nama peminjam..." value="{{ request('search') }}" aria-label="Cari peminjam">
-                        @if (request('search'))
-                            <a href="{{ route('admin.petugas.approvals.index') }}" class="btn btn-outline-secondary" title="Hapus Filter"><i class="bi bi-x"></i></a>
-                        @endif
-                        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
-                    </div>
+    <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        {{-- Card Header / Toolbar --}}
+        <div class="p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-4 bg-gray-50/50">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">
+                    Menunggu Konfirmasi
+                    <span class="ml-2 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-extrabold">{{ $pendingBorrowings->count() }}</span>
+                </h3>
+            </div>
+
+            <div class="flex flex-col sm:flex-row w-full lg:w-auto gap-3">
+                {{-- Form Pencarian --}}
+                <form action="{{ route('admin.petugas.approvals.index') }}" method="GET" class="flex w-full sm:w-auto relative">
+                    <input type="search" name="search" class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition" placeholder="Cari peminjam..." value="{{ request('search') }}">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    @if (request('search'))
+                        <a href="{{ route('admin.petugas.approvals.index') }}" class="absolute right-3 top-2.5 text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></a>
+                    @endif
                 </form>
 
-                <div class="btn-group btn-group-sm" role="group" aria-label="Aksi Massal">
-                    <button type="submit" form="bulk-approve-form" class="btn btn-primary" id="btn-approve-multiple" disabled>
-                        <i class="bi bi-check2-all me-1"></i> Konfirmasi
+                {{-- Tombol Aksi Massal --}}
+                <div class="flex gap-2">
+                    <button type="submit" form="bulk-approve-form" class="inline-flex items-center px-4 py-2 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" id="btn-approve-multiple" disabled>
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Konfirmasi
                     </button>
-                    <button type="submit" form="bulk-reject-form" class="btn btn-danger" id="btn-reject-multiple" disabled>
-                        <i class="bi bi-x-circle me-1"></i> Tolak
+                    <button type="submit" form="bulk-reject-form" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" id="btn-reject-multiple" disabled>
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Tolak
                     </button>
                 </div>
-
             </div>
         </div>
-        
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="approvalTable">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="py-3 ps-4" style="width: 5%;"><input class="form-check-input" type="checkbox" id="selectAll"></th>
-                            <th class="py-3">Nama Peminjam</th>
-                            <th class="py-3">Kelas / Mapel</th> {{-- Header disesuaikan --}}
-                            <th class="py-3">Judul Buku</th>
-                            <th class="py-3">Kode Buku</th>
-                            <th class="py-3">Tanggal Pengajuan</th>
-                            <th class="py-3 pe-4 text-end" style="width: 200px;">Aksi Individual</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $currentUserId = null; @endphp
-                        @forelse ($pendingBorrowings as $borrow)
-                            @php
-                                $isNewUser = $borrow->user_id !== $currentUserId;
-                                $currentUserId = $borrow->user_id;
-                            @endphp
-                        
-                        <tr data-user-id="{{ $borrow->user_id }}">
-                            <td class="ps-4">
-                                <input class="form-check-input borrowing-checkbox" 
-                                       type="checkbox" 
-                                       value="{{ $borrow->id }}"
-                                       data-user-id="{{ $borrow->user_id }}"
-                                       id="borrowing-{{ $borrow->id }}">
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-primary text-white me-2" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items-center; justify-content: center; font-weight: 600;">
-                                        {{ strtoupper(substr($borrow->user->name, 0, 1)) }}
-                                    </div>
-                                    <span class="fw-medium me-3">{{ $borrow->user->name }}</span>
-                                    
+
+        {{-- Tabel Data --}}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse" id="approvalTable">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
+                        <th class="p-4 w-12 text-center">
+                            <input type="checkbox" id="selectAll" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500 transition cursor-pointer">
+                        </th>
+                        <th class="p-4">Peminjam</th>
+                        <th class="p-4">Kelas / Mapel</th>
+                        <th class="p-4">Judul Buku</th>
+                        <th class="p-4">Kode Buku</th>
+                        <th class="p-4">Tanggal Pengajuan</th>
+                        <th class="p-4 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 text-sm">
+                    @php $currentUserId = null; @endphp
+                    @forelse ($pendingBorrowings as $borrow)
+                        @php
+                            $isNewUser = $borrow->user_id !== $currentUserId;
+                            $currentUserId = $borrow->user_id;
+                        @endphp
+
+                    <tr class="hover:bg-gray-50/80 transition" data-user-id="{{ $borrow->user_id }}">
+                        <td class="p-4 text-center">
+                            <input type="checkbox" value="{{ $borrow->id }}" data-user-id="{{ $borrow->user_id }}" id="borrowing-{{ $borrow->id }}" class="borrowing-checkbox w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500 transition cursor-pointer">
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 shrink-0">
+                                    {{ strtoupper(substr($borrow->user->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-800">{{ $borrow->user->name }}</div>
                                     @if ($isNewUser)
-                                        <span class="ms-1 border rounded px-2 py-1 bg-light-subtle" title="Pilih Semua Pengajuan {{ $borrow->user->name }}">
-                                            <input class="form-check-input check-all-user" 
-                                                   type="checkbox" 
-                                                   data-user-id="{{ $borrow->user_id }}" 
-                                                   id="user-{{ $borrow->user_id }}-check">
-                                            <label class="form-check-label small text-muted" for="user-{{ $borrow->user_id }}-check">Pilih Semua</label>
-                                        </span>
+                                        <label class="inline-flex items-center mt-1 cursor-pointer group">
+                                            <input type="checkbox" data-user-id="{{ $borrow->user_id }}" id="user-{{ $borrow->user_id }}-check" class="check-all-user w-3.5 h-3.5 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500 mr-1.5 transition">
+                                            <span class="text-[11px] font-semibold text-gray-400 group-hover:text-emerald-600 uppercase tracking-wide">Pilih Semua Milik {{ strtok($borrow->user->name, " ") }}</span>
+                                        </label>
                                     @endif
                                 </div>
-                            </td>
-
-                            {{-- ========================================================== --}}
-                            {{-- 🔥 UPDATE PENTING: Menggunakan class_info 🔥 --}}
-                            {{-- ========================================================== --}}
-                            <td>
-                                {{ $borrow->user->class_info ?? '-' }}
-                            </td>
-                            {{-- ========================================================== --}}
-
-                            <td><span class="text-dark">{{ $borrow->bookCopy->book->title }}</span></td>
-                            <td><span class="badge bg-secondary">{{ $borrow->bookCopy->book_code }}</span></td>
-                            <td>
-                                <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> {{ $borrow->created_at->format('d M Y, H:i') }}</small>
-                            </td>
-                            <td class="pe-4 text-end">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <form action="{{ route('admin.petugas.approvals.approve', $borrow) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm" title="Konfirmasi" onclick="return confirm('Anda yakin ingin MENYETUJUI pengajuan ini?');"><i class="bi bi-check-lg"></i></button>
-                                    </form>
-                                    <form action="{{ route('admin.petugas.approvals.reject', $borrow) }}" method="POST" onsubmit="return confirm('Anda yakin ingin MENOLAK pengajuan ini?');">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-lg"></i></button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox display-4 d-block mb-3 opacity-25"></i>
-                                    <p class="mb-0">Tidak ada pengajuan pinjaman baru.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-medium text-gray-600">
+                            {{ $borrow->user->class_info ?? '-' }}
+                        </td>
+                        <td class="p-4 font-semibold text-gray-800">
+                            {{ $borrow->bookCopy->book->title }}
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-mono text-xs rounded-lg font-semibold border border-gray-200">
+                                {{ $borrow->bookCopy->book_code }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-gray-500 font-medium">
+                            {{ $borrow->created_at->format('d M Y, H:i') }}
+                        </td>
+                        <td class="p-4">
+                            <div class="flex justify-end gap-2">
+                                <form action="{{ route('admin.petugas.approvals.approve', $borrow) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition" title="Konfirmasi" onclick="return confirm('Yakin ingin menyetujui pengajuan ini?');">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.petugas.approvals.reject', $borrow) }}" method="POST" onsubmit="return confirm('Yakin ingin menolak pengajuan ini?');">
+                                    @csrf
+                                    <button type="submit" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition" title="Tolak">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="p-10 text-center text-gray-400">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-16 h-16 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                <span class="text-base font-medium">Tidak ada pengajuan pinjaman baru.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -176,29 +169,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateFormPayloadAndButton() {
         const csrfToken = '{{ csrf_token() }}';
+
         bulkApproveForm.innerHTML = `<input type="hidden" name="_token" value="${csrfToken}">`;
         bulkRejectForm.innerHTML = `<input type="hidden" name="_token" value="${csrfToken}">`;
-        
+
         let checkedCount = 0;
+
         document.querySelectorAll('.borrowing-checkbox:checked').forEach(checkbox => {
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'borrowing_ids[]';
-            hiddenInput.value = checkbox.value;
-            
-            bulkApproveForm.appendChild(hiddenInput);
-            bulkRejectForm.appendChild(hiddenInput.cloneNode(true));
-            
+            const hiddenInputApprove = document.createElement('input');
+            hiddenInputApprove.type = 'hidden';
+            hiddenInputApprove.name = 'borrowing_ids[]';
+            hiddenInputApprove.value = checkbox.value;
+            bulkApproveForm.appendChild(hiddenInputApprove);
+
+            const hiddenInputReject = document.createElement('input');
+            hiddenInputReject.type = 'hidden';
+            hiddenInputReject.name = 'borrowing_ids[]';
+            hiddenInputReject.value = checkbox.value;
+            bulkRejectForm.appendChild(hiddenInputReject);
+
             checkedCount++;
         });
-        
-        btnApproveMultiple.disabled = checkedCount === 0;
-        btnRejectMultiple.disabled = checkedCount === 0;
+
+        if(btnApproveMultiple && btnRejectMultiple) {
+            btnApproveMultiple.disabled = checkedCount === 0;
+            btnRejectMultiple.disabled = checkedCount === 0;
+        }
     }
 
     function syncControlCheckboxes() {
-        const total = document.querySelectorAll('.borrowing-checkbox').length;
-        const checked = document.querySelectorAll('.borrowing-checkbox:checked').length;
+        const checkboxes = document.querySelectorAll('.borrowing-checkbox');
+        const checkedCheckboxes = document.querySelectorAll('.borrowing-checkbox:checked');
+        const total = checkboxes.length;
+        const checked = checkedCheckboxes.length;
+
         if (selectAllHeader) {
             selectAllHeader.checked = total > 0 && total === checked;
             selectAllHeader.indeterminate = checked > 0 && checked < total;
@@ -225,14 +229,16 @@ document.addEventListener('DOMContentLoaded', function() {
             updateFormPayloadAndButton();
         });
     }
-    
+
     document.querySelectorAll('.check-all-user').forEach(userCheck => {
         userCheck.addEventListener('change', function() {
             const userId = this.dataset.userId;
             const isChecked = this.checked;
+
             document.querySelectorAll(`.borrowing-checkbox[data-user-id="${userId}"]`).forEach(checkbox => {
                 checkbox.checked = isChecked;
             });
+
             syncControlCheckboxes();
             updateFormPayloadAndButton();
         });
@@ -244,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateFormPayloadAndButton();
         });
     });
-    
+
     updateFormPayloadAndButton();
     syncControlCheckboxes();
 });

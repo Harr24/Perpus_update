@@ -1,250 +1,190 @@
-@extends('layouts.app')
-
-{{-- ======================================================= --}}
-{{-- 1. TAMBAHKAN STYLE CSS BARU UNTUK FOTO PROFIL --}}
-{{-- ======================================================= --}}
-@section('styles')
-<style>
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 1rem;
-        overflow: hidden; /* Penting agar gambar tidak keluar dari lingkaran */
-    }
-    .avatar-circle img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Memastikan gambar memenuhi lingkaran tanpa distorsi */
-    }
-    .empty-state { text-align: center; }
-    .empty-state .bi { font-size: 3.5rem; color: #ced4da; }
-</style>
-@endsection
-
+@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4 py-4">
-    {{-- Header Section --}}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <h1 class="h3 fw-bold mb-2 page-title">Daftar Akun Guru</h1>
-                    <p class="text-muted mb-0 small">Berikut adalah daftar semua akun guru yang terdaftar dalam sistem.</p>
-                </div>
-                <a href="{{ route('admin.petugas.teachers.create') }}" class="btn btn-danger">
-                    <i class="bi bi-plus-circle me-2"></i>Tambah Akun Guru
+    <div class="max-w-7xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Data Guru</h2>
+                <p class="text-gray-500 mt-1 font-medium">Kelola seluruh akun guru yang terdaftar dalam sistem.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                    <span>⬅️</span> Kembali
+                </a>
+                <a href="{{ route('admin.petugas.teachers.create') }}" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-md text-sm">
+                    <span>➕</span> Tambah Guru
                 </a>
             </div>
         </div>
-    </div>
 
-    {{-- Back Button --}}
-    <div class="mb-3">
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-        </a>
-    </div>
+        {{-- Alert Notifikasi --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">✅</span> {{ session('success') }}
+            </div>
+        @endif
 
-    {{-- Success Alert --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    {{-- Form Pencarian --}}
-    <div class="card mb-4">
-        <div class="card-body">
-            <form action="{{ route('admin.petugas.teachers.index') }}" method="GET">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" name="search" placeholder="Cari berdasarkan nama atau email guru..." value="{{ request('search') }}">
-                    <button class="btn btn-outline-primary" type="submit">Cari</button>
+        {{-- Form Pencarian --}}
+        <div class="bg-white p-4 sm:p-6 rounded-[1.5rem] shadow-sm border border-gray-100 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <span class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">👩‍🏫</span>
+                <div>
+                    <h3 class="font-bold text-gray-900">Total: {{ $teachers->total() }} Guru</h3>
+                    <p class="text-xs text-gray-500">Terdaftar Aktif</p>
                 </div>
+            </div>
+
+            <form action="{{ route('admin.petugas.teachers.index') }}" method="GET" class="w-full sm:w-auto flex">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..."
+                       class="w-full sm:w-72 px-4 py-2.5 rounded-l-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 outline-none transition text-sm">
+                <button type="submit" class="bg-slate-900 text-white font-bold py-2.5 px-5 rounded-r-xl hover:bg-slate-800 transition shadow-sm text-sm border border-transparent border-l-0">
+                    Cari
+                </button>
             </form>
         </div>
-    </div>
 
+        {{-- Kontainer Data --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
 
-    {{-- Main Card --}}
-    <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="bi bi-person-badge me-2 text-danger"></i>
-                    Data Guru
-                </h5>
-                <span class="badge bg-secondary">{{ $teachers->total() }} Guru</span>
-            </div>
-        </div>
-        
-        <div class="card-body p-0">
-            {{-- Desktop Table View --}}
-            <div class="table-responsive d-none d-lg-block">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
+            {{-- VIEW DESKTOP (Tabel) --}}
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50/50 border-b border-gray-100">
                         <tr>
-                            <th class="py-3 ps-4" style="width: 5%;">No</th>
-                            <th class="py-3">Nama Guru</th>
-                            <th class="py-3">Email</th>
-                            <th class="py-3">Mata Pelajaran</th>
-                            <th class="py-3 text-center" style="width: 15%;">Status</th>
-                            <th class="py-3 pe-4 text-center" style="width: 10%;">Aksi</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider w-16">No</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Profil Guru</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Mata Pelajaran</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         @forelse ($teachers as $teacher)
-                        <tr>
-                            <td class="ps-4">
-                                <span class="text-muted fw-medium">{{ $loop->iteration + $teachers->firstItem() - 1 }}</span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    {{-- ======================================================= --}}
-                                    {{-- 2. PERUBAHAN UTAMA: Tampilkan foto atau inisial --}}
-                                    {{-- ======================================================= --}}
-                                    <div class="avatar-circle bg-light me-3">
-                                        <img src="{{ $teacher->profile_photo_url }}" alt="{{ $teacher->name }}">
+                            <tr class="hover:bg-gray-50/50 transition duration-200">
+                                <td class="px-6 py-4 text-sm font-bold text-gray-400">
+                                    {{ $loop->iteration + $teachers->firstItem() - 1 }}
+                                </td>
+
+                                {{-- Profil --}}
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm overflow-hidden shrink-0 border border-gray-200">
+                                            @if($teacher->profile_photo_url)
+                                                <img src="{{ $teacher->profile_photo_url }}" alt="{{ $teacher->name }}" class="w-full h-full object-cover">
+                                            @else
+                                                {{ strtoupper(substr($teacher->name, 0, 2)) }}
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-gray-900">{{ $teacher->name }}</h4>
+                                            <p class="text-xs text-gray-500 mt-0.5">{{ $teacher->email }}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span class="fw-semibold text-dark">{{ $teacher->name }}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="bi bi-envelope me-2"></i>
-                                    <span>{{ $teacher->email }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-primary">
-                                    <i class="bi bi-book me-1"></i>
-                                    {{ $teacher->subject }}
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Aktif
-                                </span>
-                            </td>
-                            <td class="pe-4 text-center">
-                                <a href="{{ route('admin.petugas.teachers.edit', $teacher) }}" class="btn btn-warning btn-sm" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                            </td>
-                        </tr>
+                                </td>
+
+                                {{-- Mata Pelajaran --}}
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                                        <span>📘</span> {{ $teacher->subject ?? 'Belum Diatur' }}
+                                    </span>
+                                </td>
+
+                                {{-- Status --}}
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                                    </span>
+                                </td>
+
+                                {{-- Aksi --}}
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ route('admin.petugas.teachers.edit', $teacher) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-xs font-bold transition border border-amber-100">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <div class="empty-state">
-                                    <i class="bi bi-inbox d-block"></i>
-                                    @if(request('search'))
-                                        <p class="mb-2 fw-medium">Guru Tidak Ditemukan</p>
-                                        <p class="small text-muted mb-3">Tidak ada guru yang cocok dengan kata kunci "{{ request('search') }}".</p>
-                                        <a href="{{ route('admin.petugas.teachers.index') }}" class="btn btn-primary btn-sm">
-                                            <i class="bi bi-arrow-left me-1"></i>Tampilkan Semua
-                                        </a>
-                                    @else
-                                        <p class="mb-2 fw-medium">Belum Ada Data Guru</p>
-                                        <p class="small text-muted mb-3">Silakan tambahkan akun guru terlebih dahulu.</p>
-                                        <a href="{{ route('admin.petugas.teachers.create') }}" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-plus-circle me-1"></i>Tambah Guru Sekarang
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="5" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <span class="text-5xl mb-4">📭</span>
+                                        @if(request('search'))
+                                            <h3 class="text-lg font-bold text-gray-900">Guru Tidak Ditemukan</h3>
+                                            <p class="text-gray-500 mt-1 mb-4">Tidak ada guru yang cocok dengan kata kunci "{{ request('search') }}".</p>
+                                            <a href="{{ route('admin.petugas.teachers.index') }}" class="text-emerald-600 font-bold hover:underline">Tampilkan Semua</a>
+                                        @else
+                                            <h3 class="text-lg font-bold text-gray-900">Belum Ada Data Guru</h3>
+                                            <p class="text-gray-500 mt-1 mb-4">Silakan tambahkan akun guru terlebih dahulu ke dalam sistem.</p>
+                                            <a href="{{ route('admin.petugas.teachers.create') }}" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                                                Tambah Guru Sekarang
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            {{-- Mobile/Tablet Card View --}}
-            <div class="d-lg-none p-3">
+            {{-- VIEW MOBILE (Cards) --}}
+            <div class="md:hidden p-4 space-y-4">
                 @forelse ($teachers as $teacher)
-                <div class="card mb-3 border shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            {{-- ======================================================= --}}
-                            {{-- 3. PERUBAHAN DI TAMPILAN MOBILE JUGA --}}
-                            {{-- ======================================================= --}}
-                            <div class="avatar-circle bg-light me-3" style="width: 50px; height: 50px;">
-                                <img src="{{ $teacher->profile_photo_url }}" alt="{{ $teacher->name }}">
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">{{ $teacher->name }}</h6>
-                                        <span class="badge bg-success small">
-                                            <i class="bi bi-check-circle me-1"></i>Aktif
-                                        </span>
-                                    </div>
-                                    <span class="badge bg-secondary">{{ $loop->iteration + $teachers->firstItem() - 1 }}</span>
-                                </div>
-                            </div>
+                    <div class="p-4 rounded-xl border border-gray-100 bg-gray-50/50 shadow-sm relative">
+                        <div class="absolute top-4 right-4">
+                            <span class="text-xs font-bold text-gray-400">#{{ $loop->iteration + $teachers->firstItem() - 1 }}</span>
                         </div>
-                        
-                        <div class="border-top pt-3">
-                            <div class="mb-2">
-                                <small class="text-muted d-block mb-1">
-                                    <i class="bi bi-envelope me-1"></i> Email
-                                </small>
-                                <span class="fw-medium">{{ $teacher->email }}</span>
+
+                        <div class="flex items-center gap-3 mb-4 pr-6">
+                            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm overflow-hidden shrink-0 border border-gray-200">
+                                @if($teacher->profile_photo_url)
+                                    <img src="{{ $teacher->profile_photo_url }}" alt="{{ $teacher->name }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ strtoupper(substr($teacher->name, 0, 2)) }}
+                                @endif
                             </div>
                             <div>
-                                <small class="text-muted d-block mb-1">
-                                    <i class="bi bi-book me-1"></i> Mata Pelajaran
-                                </small>
-                                <span class="badge bg-primary">{{ $teacher->subject }}</span>
+                                <h4 class="text-sm font-bold text-gray-900">{{ $teacher->name }}</h4>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                                    <span class="w-1 h-1 rounded-full bg-emerald-500"></span> Aktif
+                                </span>
                             </div>
                         </div>
-                        
-                        <div class="border-top pt-3 mt-3 text-end">
-                             <a href="{{ route('admin.petugas.teachers.edit', $teacher) }}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
+
+                        <div class="space-y-2 mb-4 text-sm">
+                            <div class="flex justify-between items-center border-t border-dashed border-gray-200 pt-2">
+                                <span class="text-gray-500 font-medium">Email</span>
+                                <span class="font-bold text-gray-900 truncate pl-4">{{ $teacher->email }}</span>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-dashed border-gray-200 pt-2">
+                                <span class="text-gray-500 font-medium">Mata Pelajaran</span>
+                                <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-xs">{{ $teacher->subject ?? '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-4 flex justify-end">
+                            <a href="{{ route('admin.petugas.teachers.edit', $teacher) }}" class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-xl text-sm font-bold transition w-full">
+                                Edit Guru
                             </a>
                         </div>
                     </div>
-                </div>
                 @empty
-                 <div class="empty-state py-5">
-                    <i class="bi bi-inbox d-block"></i>
-                     @if(request('search'))
-                        <p class="mb-2 fw-medium">Guru Tidak Ditemukan</p>
-                        <p class="small text-muted mb-3">Tidak ada guru yang cocok dengan kata kunci "{{ request('search') }}".</p>
-                        <a href="{{ route('admin.petugas.teachers.index') }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-arrow-left me-1"></i>Tampilkan Semua
-                        </a>
-                    @else
-                        <p class="mb-2 fw-medium">Belum Ada Data Guru</p>
-                        <p class="small text-muted mb-3">Silakan tambahkan akun guru terlebih dahulu.</p>
-                        <a href="{{ route('admin.petugas.teachers.create') }}" class="btn btn-danger btn-sm">
-                            <i class="bi bi-plus-circle me-1"></i>Tambah Guru Sekarang
-                        </a>
-                    @endif
-                </div>
+                    <div class="text-center py-10">
+                        <span class="text-4xl mb-3 block">📭</span>
+                        <h3 class="text-base font-bold text-gray-900">Belum ada data</h3>
+                        <p class="text-sm text-gray-500 mt-1">Data guru belum tersedia.</p>
+                    </div>
                 @endforelse
             </div>
-        </div>
 
-        {{-- Pagination Links --}}
-        @if($teachers->hasPages())
-        <div class="card-footer bg-light border-top">
-             <div class="d-flex justify-content-center">
-                {{ $teachers->links() }}
-            </div>
+            {{-- Pagination --}}
+            @if($teachers->hasPages())
+                <div class="p-6 border-t border-gray-100">
+                    {{ $teachers->links() }}
+                </div>
+            @endif
         </div>
-        @endif
     </div>
-</div>
 @endsection

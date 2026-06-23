@@ -1,123 +1,110 @@
-@extends('layouts.app') {{-- Menggunakan layout utama --}}
+@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4 py-4">
-    {{-- Header Halaman --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold mb-2" style="color: #d9534f;">Tambah Akun Petugas Baru</h1>
-            <p class="text-muted mb-0 small">Masukkan detail untuk akun petugas baru.</p>
+    <div class="max-w-3xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Tambah Akun Petugas</h2>
+                <p class="text-gray-500 mt-1 font-medium">Masukkan detail untuk mendaftarkan akun petugas baru.</p>
+            </div>
+            <a href="{{ route('admin.superadmin.petugas.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-        <a href="{{ route('admin.superadmin.petugas.index') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Petugas
-        </a>
-    </div>
 
-    {{-- Menampilkan Error Validasi --}}
-    @if ($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Terjadi Kesalahan</h5>
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+        {{-- Alert Error Validasi --}}
+        @if ($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Terdapat Kesalahan:
+                </div>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-7 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-    <div class="card shadow-sm border-start border-danger border-4">
-        <div class="card-body">
-            <form action="{{ route('admin.superadmin.petugas.store') }}" method="POST" class="needs-validation" novalidate>
+        {{-- Form Card Utama --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-8">
+            <form action="{{ route('admin.superadmin.petugas.store') }}" method="POST">
                 @csrf
 
-                {{-- Nama --}}
-                <div class="mb-3">
-                    <label for="name" class="form-label required">Nama Lengkap</label>
-                    <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required placeholder="Masukkan nama lengkap petugas">
+                {{-- Nama Lengkap --}}
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-bold text-gray-700 mb-2">
+                        Nama Lengkap <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                           placeholder="Masukkan nama lengkap petugas"
+                           class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
                     @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 {{-- Email --}}
-                <div class="mb-3">
-                    <label for="email" class="form-label required">Alamat Email</label>
-                    <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required placeholder="Contoh: petugas@email.com">
-                     @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                     @else
-                         <div class="form-text">Pastikan email unik dan valid.</div>
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-bold text-gray-700 mb-2">
+                        Alamat Email <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                           placeholder="Contoh: petugas@email.com"
+                           class="w-full px-4 py-3 rounded-xl border @error('email') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                    @error('email')
+                        <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
+                    @else
+                        <p class="mt-1.5 text-xs text-gray-400 font-medium">Pastikan email unik dan valid untuk keperluan login.</p>
                     @enderror
                 </div>
 
-                {{-- ========================================================== --}}
-                {{-- PERUBAHAN: Role diset otomatis ke 'petugas' --}}
-                {{-- ========================================================== --}}
-                {{-- Input Role (tersembunyi, otomatis 'petugas') --}}
-                <input type="hidden" name="role" value="petugas">
-                {{-- Menampilkan Role (hanya teks, tidak bisa diubah) --}}
-                <div class="mb-3">
-                    <label class="form-label">Role Akun</label>
-                    <input type="text" class="form-control" value="Petugas" disabled readonly>
-                    <div class="form-text">Akun yang dibuat melalui form ini akan otomatis memiliki role Petugas.</div>
+                {{-- Role Akun (Otomatis Petugas & Terkunci) --}}
+                <div class="mb-6">
+                    <input type="hidden" name="role" value="petugas">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Role Akun</label>
+                    <input type="text" value="Petugas" disabled
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 font-bold cursor-not-allowed">
+                    <p class="mt-1.5 text-xs text-gray-400 font-medium">Akun yang dibuat melalui form ini otomatis memiliki hak akses sebagai Petugas.</p>
                 </div>
-                {{-- ========================================================== --}}
 
+                <div class="h-px bg-gray-100 my-8"></div>
 
-                {{-- Password --}}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label required">Password</label>
-                        <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" required placeholder="Minimal 8 karakter">
+                {{-- Keamanan (Password & Konfirmasi) --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label for="password" class="block text-sm font-bold text-gray-700 mb-2">
+                            Password <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="password" id="password" name="password" required
+                               placeholder="Minimal 8 karakter"
+                               class="w-full px-4 py-3 rounded-xl border @error('password') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
                         @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="password_confirmation" class="form-label required">Konfirmasi Password</label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required placeholder="Ulangi password">
-                        {{-- Error konfirmasi biasanya ditangani oleh validasi 'confirmed' --}}
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-bold text-gray-700 mb-2">
+                            Konfirmasi Password <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required
+                               placeholder="Ulangi password"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-4 focus:ring-slate-50 outline-none transition bg-gray-50 focus:bg-white">
                     </div>
                 </div>
 
                 {{-- Tombol Aksi --}}
-                <div class="d-flex gap-2 pt-3 border-top">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-save me-1"></i> Simpan Akun Petugas
+                <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center justify-center bg-slate-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-slate-800 transition shadow-sm hover:shadow-md">
+                        Simpan Petugas
                     </button>
-                    <a href="{{ route('admin.superadmin.petugas.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.superadmin.petugas.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-50 transition shadow-sm">
                         Batal
                     </a>
                 </div>
             </form>
         </div>
     </div>
-</div>
 @endsection
-
-@push('scripts')
-{{-- Script untuk validasi form Bootstrap (jika belum ada di layout utama) --}}
-<script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (function () {
-      'use strict'
-
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      var forms = document.querySelectorAll('.needs-validation')
-
-      // Loop over them and prevent submission
-      Array.prototype.slice.call(forms)
-        .forEach(function (form) {
-          form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-
-            form.classList.add('was-validated')
-          }, false)
-        })
-    })()
-</script>
-@endpush

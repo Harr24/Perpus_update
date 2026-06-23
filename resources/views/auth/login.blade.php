@@ -48,7 +48,7 @@
 <body>
     <div class="login-container">
         <div class="red-stripe"></div>
-        
+
         <div class="login-header">
             <h2>Login Anggota</h2>
             <p class="login-subtitle">Selamat datang di website perpustakaan multicomp!</p>
@@ -78,14 +78,14 @@
                     <div class="input-error-message">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <button type="submit">Masuk Sekarang</button>
         </form>
 
         <div class="login-footer">
             Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
         </div>
-        
+
         {{-- =============================================== --}}
         {{-- TAMBAHAN: Tombol Kembali ke Homepage           --}}
         {{-- =============================================== --}}

@@ -1,173 +1,152 @@
-<section class="page">
-  <header class="page-header">
-    <div>
-      <h1 class="page-title">Daftar Genre</h1>
-      <p class="page-sub">Kelola genre buku di perpustakaan</p>
-    </div>
+@extends('layouts.admin')
 
-    <div class="actions">
-      <a class="btn btn-ghost" href="{{ route('dashboard') }}">Kembali ke Dashboard</a>
-      <a class="btn btn-primary" href="{{ route('admin.petugas.genres.create') }}">Tambah Genre Baru</a>
-    </div>
-  </header>
+@section('content')
+    <div class="max-w-7xl mx-auto">
 
-  @if(session('success'))
-    <div class="alert success" role="status">{{ session('success') }}</div>
-  @endif
-
-  @if(session('error'))
-    <div class="alert error" role="status">{{ session('error') }}</div>
-  @endif
-
-  <div class="table-wrap" role="table" aria-label="Daftar Genre">
-    {{-- TABLE HEAD --}}
-    <div class="table-head">
-      <div class="cell col-no">No</div>
-      <div class="cell col-icon">Icon</div> {{-- Kolom Baru --}}
-      <div class="cell col-code">Kode Genre</div>
-      <div class="cell col-name">Nama Genre</div>
-      <div class="cell col-action">Aksi</div>
-    </div>
-
-    {{-- TABLE BODY --}}
-    <div class="table-body">
-      @forelse ($genres as $genre)
-        <div class="row" role="row">
-          <div class="cell col-no" data-label="No">{{ $loop->iteration }}</div>
-          
-          {{-- Kolom Icon --}}
-          <div class="cell col-icon" data-label="Icon">
-            @if($genre->icon)
-                <img src="{{ asset('storage/' . $genre->icon) }}" alt="Icon" class="genre-icon">
-            @else
-                <span class="no-icon">No Icon</span>
-            @endif
-          </div>
-
-          <div class="cell col-code" data-label="Kode Genre">{{ $genre->genre_code }}</div>
-          <div class="cell col-name" data-label="Nama Genre">{{ $genre->name }}</div>
-          
-          <div class="cell col-action" data-label="Aksi">
-            <a class="action edit" href="{{ route('admin.petugas.genres.edit', $genre->id) }}" aria-label="Edit {{ $genre->name }}">Edit</a>
-
-            <form class="inline-form" action="{{ route('admin.petugas.genres.destroy', $genre->id) }}" method="POST" onsubmit="return confirmDelete(event, this);" aria-label="Hapus {{ $genre->name }}">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="action delete">Hapus</button>
-            </form>
-          </div>
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Daftar Genre</h2>
+                <p class="text-gray-500 mt-1 font-medium">Kelola kategori dan genre buku yang ada di perpustakaan.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                    <span>⬅️</span> Kembali
+                </a>
+                <a href="{{ route('admin.petugas.genres.create') }}" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-md text-sm">
+                    <span>➕</span> Tambah Genre
+                </a>
+            </div>
         </div>
-      @empty
-        <div class="row empty">
-          <div class="cell" style="width:100%;">Belum ada data genre.</div>
+
+        {{-- Alert Notifikasi --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">✅</span> {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-rose-50 text-rose-700 border border-rose-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">⚠️</span> {{ session('error') }}
+            </div>
+        @endif
+
+        {{-- Kontainer Tabel --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50/50 border-b border-gray-100">
+                        <tr>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider w-16 text-center">No</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center w-24">Icon</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Kode Genre</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Nama Genre</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($genres as $genre)
+                            <tr class="hover:bg-gray-50/80 transition duration-200">
+
+                                {{-- Nomor --}}
+                                <td class="px-6 py-4 text-sm font-bold text-gray-400 text-center">
+                                    {{ $loop->iteration }}
+                                </td>
+
+                                {{-- Icon --}}
+                                <td class="px-6 py-4 flex justify-center">
+                                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
+                                        @if($genre->icon)
+                                            <img src="{{ asset('storage/' . $genre->icon) }}" alt="{{ $genre->name }}" class="w-full h-full object-cover">
+                                        @else
+                                            <span class="text-[10px] font-bold text-gray-400 uppercase">N/A</span>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                {{-- Kode Genre --}}
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-600 border border-slate-200">
+                                        {{ $genre->genre_code }}
+                                    </span>
+                                </td>
+
+                                {{-- Nama Genre --}}
+                                <td class="px-6 py-4 text-sm font-bold text-gray-900">
+                                    {{ $genre->name }}
+                                </td>
+
+                                {{-- Aksi --}}
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('admin.petugas.genres.edit', $genre->id) }}"
+                                           class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg text-xs font-bold transition border border-amber-200">
+                                            Edit
+                                        </a>
+
+                                        <form action="{{ route('admin.petugas.genres.destroy', $genre->id) }}" method="POST" class="form-delete-genre m-0" data-name="{{ $genre->name }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition border border-rose-200">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <span class="text-5xl mb-4 opacity-50">📂</span>
+                                        <h3 class="text-lg font-bold text-gray-900">Data Kosong</h3>
+                                        <p class="text-gray-500 mt-1 mb-4">Belum ada data genre yang ditambahkan.</p>
+                                        <a href="{{ route('admin.petugas.genres.create') }}" class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                                            Tambah Genre Baru
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-      @endforelse
     </div>
-  </div>
-</section>
+@endsection
 
-<style>
-  :root{
-    --bg:#fff;
-    --muted:#6b7280;
-    --red:#d9534f;
-    --red-dark:#b93a37;
-    --card:#ffffff;
-    --radius:10px;
-    --gap:14px;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
+@push('scripts')
+    {{-- SweetAlert2 untuk Konfirmasi Hapus --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.form-delete-genre');
 
-  .page{max-width:1100px;margin:20px auto;padding:18px}
-  .page-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
-  .page-title{margin:0;font-size:1.25rem;color:var(--red-dark)}
-  .page-sub{margin:3px 0 0;color:var(--muted);font-size:0.95rem}
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-  .actions{display:flex;gap:8px;align-items:center}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer}
-  .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(217,83,79,0.12)}
-  .btn-primary:hover{background:var(--red-dark)}
-  .btn-ghost{background:transparent;color:var(--red);border-color:transparent}
-  .alert{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-weight:600}
-  .alert.success{background:#eefdf5;color:#065f46;border:1px solid rgba(16,185,129,0.08)}
-  .alert.error{background:#fef2f2;color:#991b1b;border:1px solid rgba(239,68,68,0.08)}
+                    const genreName = this.dataset.name;
 
-  /* Table like layout */
-  .table-wrap{background:var(--card);border-radius:var(--radius);padding:8px;border:1px solid #f1f5f9;box-shadow:0 8px 24px rgba(15,23,36,0.04)}
-  
-  /* GRID LAYOUT UPDATE (5 Kolom: No, Icon, Kode, Nama, Aksi) */
-  .table-head{display:grid;grid-template-columns:50px 80px 100px 1fr 180px;gap:12px;padding:12px 14px;border-bottom:1px solid #f3f4f6;align-items:center}
-  
-  .table-head .cell{font-weight:700;color:var(--red-dark);font-size:0.95rem}
-  .table-body{display:flex;flex-direction:column;gap:10px;padding:12px 6px}
-
-  /* GRID LAYOUT ROW */
-  .row{display:grid;grid-template-columns:50px 80px 100px 1fr 180px;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid transparent;transition:transform .14s ease,box-shadow .14s ease}
-  
-  .row:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(15,23,36,0.06)}
-  .row.empty{justify-content:center;background:transparent;border:none;box-shadow:none;padding:20px;color:var(--muted);font-weight:600}
-
-  .cell{padding:6px 10px}
-  .col-no{color:var(--muted);font-weight:600}
-  .col-code{font-weight:700;color:var(--muted)}
-  .col-name{font-weight:700}
-  .col-action{display:flex;gap:8px;justify-content:flex-end;align-items:center}
-
-  /* Styling Icon */
-  .genre-icon {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #eee;
-  }
-  .no-icon {
-      font-size: 0.75rem;
-      color: #999;
-      background: #f3f4f6;
-      padding: 4px 8px;
-      border-radius: 4px;
-  }
-
-  .action{padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:700;cursor:pointer;border:1px solid transparent;font-size:0.9rem}
-  .action.edit{background:transparent;color:var(--red);border-color:rgba(217,83,79,0.06)}
-  .action.edit:hover{background:rgba(217,83,79,0.06)}
-  .action.delete{background:transparent;color:#ef4444;border-color:rgba(239,68,68,0.06)}
-  .action.delete:hover{background:rgba(239,68,68,0.06)}
-
-  .inline-form{display:inline;margin:0}
-
-  /* Responsive Mobile */
-  @media (max-width:800px){
-    .table-head{display:none}
-    .row{grid-template-columns:1fr;padding:14px;gap:8px;border-bottom:1px solid #f0f0f0}
-    
-    .col-no{order:1;display:none} /* Sembunyikan No di HP biar ringkas */
-    
-    /* Icon di paling atas */
-    .col-icon{order:1; justify-content:center; display:flex;}
-    .genre-icon{width:60px; height:60px;}
-
-    .col-name{order:2;font-size:1.1rem;text-align:center}
-    .col-code{order:3;text-align:center;font-size:0.9rem}
-    .col-action{order:4;justify-content:center;margin-top:10px}
-    
-    .cell[data-label]:before{
-      /* content: attr(data-label); <-- Hapus label di mobile biar bersih */
-      display:none;
-    }
-  }
-
-  a:focus, button:focus{outline:3px solid rgba(217,83,79,0.14);outline-offset:3px}
-</style>
-
-<script>
-  function confirmDelete(e, form){
-    e.preventDefault();
-    const name = form.closest('.row')?.querySelector('.col-name')?.textContent?.trim() || 'item ini';
-    if(confirm('Hapus "' + name + '"? Tindakan ini tidak dapat dibatalkan.')){
-      form.submit();
-    }
-    return false;
-  }
-</script>
+                    Swal.fire({
+                        title: 'Hapus Genre?',
+                        html: `Anda yakin ingin menghapus genre <strong>"${genreName}"</strong>?<br><span class="text-sm text-rose-500">Tindakan ini tidak dapat dibatalkan.</span>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e11d48', // Rose-600
+                        cancelButtonColor: '#6b7280', // Gray-500
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal',
+                        borderRadius: '1.5rem'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+@endpush

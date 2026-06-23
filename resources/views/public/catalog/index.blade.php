@@ -10,30 +10,30 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        :root { 
-            --brand-red: #c62828; 
+        :root {
+            --brand-red: #c62828;
             --brand-red-hover: #b71c1c;
         }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f8f9fa; 
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
             overflow-x: hidden;
         }
-        
+
         /* NAVBAR */
         .navbar { transition: all 0.3s ease; }
         .navbar-brand { font-size: 1.25rem; transition: transform 0.3s ease; }
         .navbar-brand:hover { transform: scale(1.05); }
         .navbar-brand img { height: 50px !important; transition: all 0.3s ease; }
         @media (max-width: 768px) { .navbar-brand img { height: 40px !important; } }
-        
+
         /* Button animations */
         .btn { transition: all 0.3s ease; position: relative; overflow: hidden; }
         .btn::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
         .btn:hover::before { width: 300px; height: 300px; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        
+
         /* HERO SLIDER */
         .hero-slider .carousel-item { height: 60vh !important; max-height: 580px !important; min-height: 400px !important; position: relative; background-size: cover; background-position: center; animation: kenBurns 20s ease infinite; }
         .hero-slider .carousel-item img { display: none; }
@@ -47,28 +47,28 @@
         @media (max-width: 768px) { .hero-slider .carousel-item { height: 50vh !important; min-height: 300px !important; } .hero-slider .carousel-caption { left: 8%; width: 80%; } .hero-slider .carousel-caption h1 { font-size: 1.75rem; } .hero-slider .carousel-caption p { display: none; } }
         .carousel-control-prev-icon, .carousel-control-next-icon { background-color: rgba(198, 40, 40, 0.8); padding: 15px; border-radius: 50%; transition: all 0.3s ease; }
         .carousel-control-prev-icon:hover, .carousel-control-next-icon:hover { background-color: rgba(198, 40, 40, 1); transform: scale(1.1); }
-        
+
         /* SEARCH BAR */
         .search-container { position: relative; }
         .search-container .input-group { transition: all 0.3s ease; }
         .search-container .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(198, 40, 40, 0.25); border-color: var(--brand-red); }
-        
+
         /* SUBJECT CARDS (GENRE) - UPDATE UNTUK ICON */
         .subject-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1rem; border-radius: 12px; background-color: #fff; border: 2px solid #e9ecef; text-decoration: none; color: #212529; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
         .subject-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(198, 40, 40, 0.1), transparent); transition: left 0.5s ease; }
         .subject-card:hover::before { left: 100%; }
         .subject-card:hover { transform: translateY(-8px) scale(1.05); box-shadow: 0 12px 30px rgba(198, 40, 40, 0.2); border-color: var(--brand-red); }
-        
-        .subject-code { 
-            width: 70px; height: 70px; 
-            border-radius: 50%; 
-            background: linear-gradient(135deg, #fce4ec, #f8bbd0); 
-            color: var(--brand-red); 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.5rem; font-weight: 700; 
-            margin-bottom: 1rem; 
-            transition: all 0.3s ease; 
-            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2); 
+
+        .subject-code {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+            color: var(--brand-red);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
             overflow: hidden; /* Tambahan agar gambar tidak keluar */
             position: relative;
         }
@@ -78,7 +78,7 @@
         .subject-card:hover .subject-code { transform: rotate(360deg) scale(1.1); background: linear-gradient(135deg, var(--brand-red), #e53935); color: white; }
         .subject-name { transition: all 0.3s ease; }
         .subject-card:hover .subject-name { color: var(--brand-red); transform: scale(1.05); }
-        
+
         /* BOOK CARDS */
         .book-card, .material-card { border: 1px solid #dee2e6; display: flex; flex-direction: column; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 12px; overflow: hidden; position: relative; }
         .book-card::before, .material-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(198, 40, 40, 0.1) 0%, transparent 70%); opacity: 0; transition: opacity 0.5s ease; }
@@ -89,7 +89,7 @@
         .card-body { flex-grow: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
         .card-footer { border-top: 1px dashed #e9ecef !important; transition: background-color 0.3s ease; }
         .book-card:hover .card-footer { background-color: #fff5f5; }
-        
+
         /* GAMIFIKASI PERINGKAT */
         .borrower-card { border: none; transition: all 0.4s ease; border-radius: 16px; position: relative; overflow: visible; background: #fff; }
         .borrower-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
@@ -109,7 +109,7 @@
         .display-6 { position: relative; display: inline-block; }
         .display-6::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 4px; background: linear-gradient(90deg, var(--brand-red), #e53935); transition: width 0.5s ease; }
         [data-aos].aos-animate .display-6::after { width: 100px; }
-        
+
         /* MATERIAL CARDS */
         .material-card .card-body { transition: all 0.3s ease; }
         .material-card:hover .card-body { background-color: #fff8f8; }
@@ -248,7 +248,7 @@
                 @endforeach
             </div>
         </section>
-        
+
         {{-- Kategori (GENRE) --}}
         <div class="container py-5" id="search-section">
             <div class="text-center mb-5" data-aos="fade-up">
@@ -267,10 +267,7 @@
                     </div>
                 </div>
             </div>
-            
-            {{-- ========================================================== --}}
-            {{-- 🔥 LOGIKA TAMPILKAN ICON GENRE 🔥 --}}
-            {{-- ========================================================== --}}
+            {{--LOGIKA TAMPILKAN ICON GENRE--}}
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3" data-aos="fade-up" data-aos-delay="200">
                 @forelse ($genres as $genre)
                     <div class="col">
@@ -322,7 +319,7 @@
                 @endif
             </div>
         </div>
-        
+
         {{-- Buku Terbaru --}}
         <div class="bg-white py-5 mt-5 shadow-sm" data-aos="fade-up">
              <div class="container">
@@ -392,13 +389,13 @@
                     <div class="h-1 w-20 bg-red-500 mx-auto mt-2 mb-4 rounded"></div>
                     <p class="lead text-muted">Apresiasi bagi para penikmat koleksi kami.</p>
                 </div>
-                
+
                 <div class="row g-4 justify-content-center">
                     @foreach ($topBorrowers as $borrower)
                         @php
                             $rankClass = '';
                             $rankIcon = '';
-                            
+
                             if ($loop->iteration == 1) {
                                 $rankClass = 'rank-1'; // Emas
                                 $rankIcon = '<i class="bi bi-trophy-fill text-warning"></i>';
@@ -414,7 +411,7 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="card text-center h-100 shadow-sm borrower-card bg-white {{ $rankClass }}">
                                 <div class="card-body p-4 d-flex flex-column align-items-center">
-                                    
+
                                     <div class="reader-avatar-container">
                                         <div class="rank-badge">{!! $rankIcon !!}</div>
 
@@ -426,11 +423,11 @@
                                             </div>
                                         @endif
                                     </div>
-                                    
+
                                     <h5 class="card-title fw-bold text-danger mb-1 text-truncate w-100" title="{{ $borrower->name }}">
                                         {{ $borrower->name }}
                                     </h5>
-                                    
+
                                     <div class="mb-3">
                                         @if($borrower->role === 'siswa')
                                             @if($borrower->class == 'Lulus')

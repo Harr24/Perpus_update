@@ -1,179 +1,181 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<div class="container py-4">
-    {{-- Header --}}
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-        <div>
-            <h1 class="h3 fw-bold mb-1" style="color: #d9534f;">Riwayat Pembayaran Denda</h1>
-            <p class="text-muted mb-0 small">Daftar transaksi pembayaran denda (termasuk cicilan).</p>
+    <div class="max-w-7xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Riwayat Pembayaran</h2>
+                <p class="text-gray-500 mt-1 font-medium">Log transaksi masuk untuk denda keterlambatan (termasuk cicilan).</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                    <span>⬅️</span> Kembali
+                </a>
+                <a href="{{ route('admin.petugas.fines.index') }}" class="inline-flex items-center gap-2 bg-rose-50 text-rose-600 border border-rose-200 font-bold py-2.5 px-5 rounded-xl hover:bg-rose-100 transition shadow-sm text-sm">
+                    <span>💸</span> Bayar Denda
+                </a>
+            </div>
         </div>
-         <div class="d-flex gap-2">
-             <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                 <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-             </a>
-             <a href="{{ route('admin.petugas.fines.index') }}" class="btn btn-outline-danger btn-sm">
-                 <i class="bi bi-cash-coin me-1"></i> Bayar Denda
-             </a>
-         </div>
-    </div>
 
-    {{-- Form Filter --}}
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-body p-3">
-            {{-- Action diarahkan ke rute Petugas --}}
-            <form action="{{ route('admin.petugas.fines.history') }}" method="GET" class="row gx-2 gy-3 align-items-end">
-                <div class="col-md-3 col-sm-6">
-                    <label for="search" class="form-label small">Cari Nama/Judul</label>
-                    <input type="text" name="search" id="search" class="form-control form-control-sm" value="{{ request('search') }}" placeholder="Nama siswa atau judul buku...">
+        {{-- Alert Notifikasi --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">✅</span> {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-rose-50 text-rose-700 border border-rose-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">⚠️</span> {{ session('error') }}
+            </div>
+        @endif
+
+        {{-- Filter Bar --}}
+        <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-gray-100 mb-8">
+            <form action="{{ route('admin.petugas.fines.history') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-400 uppercase mb-2">Cari</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama / Judul buku..."
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-4 focus:ring-slate-50 outline-none transition text-sm">
                 </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <label for="year" class="form-label small">Tahun Bayar</label>
-                    <select name="year" id="year" class="form-select form-select-sm">
-                        <option value="">-- Semua --</option>
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-400 uppercase mb-2">Tahun Bayar</label>
+                    <select name="year" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-4 focus:ring-slate-50 outline-none transition text-sm cursor-pointer">
+                        <option value="">Semua Tahun</option>
                         @foreach ($years as $year)
-                            <option value="{{ $year->year }}" {{ request('year') == $year->year ? 'selected' : '' }}>
-                                {{ $year->year }}
-                            </option>
+                            <option value="{{ $year->year }}" {{ request('year') == $year->year ? 'selected' : '' }}>{{ $year->year }}</option>
                         @endforeach
                     </select>
                 </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <label for="month" class="form-label small">Bulan Bayar</label>
-                    <select name="month" id="month" class="form-select form-select-sm">
-                        <option value="">-- Semua --</option>
-                        @php
-                            $months = [
-                                1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
-                                7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
-                            ];
-                        @endphp
-                        @foreach ($months as $num => $name)
-                            <option value="{{ $num }}" {{ request('month') == $num ? 'selected' : '' }}>
-                                {{ $name }}
-                            </option>
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-400 uppercase mb-2">Bulan Bayar</label>
+                    <select name="month" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-4 focus:ring-slate-50 outline-none transition text-sm cursor-pointer">
+                        <option value="">Semua Bulan</option>
+                        @foreach ([1=>'Jan', 2=>'Feb', 3=>'Mar', 4=>'Apr', 5=>'Mei', 6=>'Jun', 7=>'Jul', 8=>'Agu', 9=>'Sep', 10=>'Okt', 11=>'Nov', 12=>'Des'] as $num => $name)
+                            <option value="{{ $num }}" {{ request('month') == $num ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
                 </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-danger btn-sm flex-grow-1"><i class="bi bi-funnel-fill"></i> Filter</button>
-                        
-                        {{-- Tombol Export --}}
-                        <a href="{{ route('admin.petugas.fines.export', request()->query()) }}" class="btn btn-success btn-sm" title="Export ke Excel">
-                            <i class="bi bi-file-earmark-excel-fill"></i> <span class="d-none d-lg-inline">Export</span>
-                        </a>
-                        
-                        @if(request()->has('search') || request()->has('year') || request()->has('month'))
-                            <a href="{{ route('admin.petugas.fines.history') }}" class="btn btn-outline-secondary btn-sm" title="Reset Filter">
-                                <i class="bi bi-x-lg"></i>
-                            </a>
-                        @endif
-                    </div>
+                <div class="flex items-center gap-2">
+                    <button type="submit" class="flex-1 bg-slate-900 text-white font-bold py-2.5 rounded-xl hover:bg-slate-800 transition shadow-sm text-sm">Filter</button>
+                    <a href="{{ route('admin.petugas.fines.export', request()->query()) }}" class="bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-emerald-700 transition shadow-sm text-sm" title="Export Excel">📊</a>
+                    @if(request()->has('search') || request()->has('year') || request()->has('month'))
+                        <a href="{{ route('admin.petugas.fines.history') }}" class="bg-gray-100 text-gray-500 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition shadow-sm text-sm" title="Reset Filter">✖</a>
+                    @endif
                 </div>
             </form>
         </div>
-    </div>
 
-    {{-- Tabel Riwayat Pembayaran --}}
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-danger text-white py-2">
-            <h6 class="mb-0 fw-semibold"><i class="bi bi-receipt me-2"></i>Log Transaksi Masuk</h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0 small">
-                    <thead class="table-light text-muted">
+        {{-- Tabel Riwayat --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+
+            <div class="p-6 border-b border-gray-100 bg-emerald-50/50 flex items-center gap-3">
+                <span class="text-emerald-600 text-xl">🧾</span>
+                <h3 class="text-lg font-extrabold text-emerald-900">Log Transaksi Masuk</h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50/50 border-b border-gray-100">
                         <tr>
-                            <th class="py-2 px-3">Tgl Bayar</th>
-                            <th class="py-2 px-3">Nama Siswa</th>
-                            <th class="py-2 px-3">Kelas / Mapel</th>
-                            <th class="py-2 px-3">Judul Buku</th>
-                            <th class="py-2 px-3 text-end">Nominal Bayar</th> 
-                            <th class="py-2 px-3 text-center">Petugas</th>
-                            <th class="py-2 px-3 text-center">Status Peminjaman</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Tgl Bayar</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Peminjam</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Buku</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-right">Nominal Masuk</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Petugas</th>
+                            <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Status Peminjaman</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         @forelse ($payments as $payment)
-                            <tr>
-                                <td class="px-3">
-                                    {{ $payment->created_at->format('d/m/Y') }}
-                                    <span class="text-muted small d-block">{{ $payment->created_at->format('H:i') }}</span>
+                            <tr class="hover:bg-gray-50/80 transition duration-200">
+
+                                {{-- Tanggal --}}
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-900">{{ $payment->created_at->format('d M Y') }}</div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Pukul {{ $payment->created_at->format('H:i') }}</div>
                                 </td>
 
-                                <td class="px-3 fw-medium">
-                                    {{ $payment->borrowing->user->name ?? 'User Dihapus' }}
+                                {{-- Peminjam --}}
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-900">{{ $payment->borrowing->user->name ?? 'User Terhapus' }}</div>
+                                    <div class="text-xs text-gray-500 font-medium mt-0.5">{{ $payment->borrowing->user->class_info ?? '-' }}</div>
                                 </td>
-                                
-                                {{-- ========================================================== --}}
-                                {{-- 🔥 INI PERBAIKANNYA: Menggunakan class_info 🔥 --}}
-                                {{-- ========================================================== --}}
-                                <td class="px-3">
-                                    {{ $payment->borrowing->user->class_info ?? '-' }}
-                                </td>
-                                {{-- ========================================================== --}}
 
-                                <td class="px-3">
-                                    <span class="d-inline-block text-truncate" style="max-width: 200px;">
+                                {{-- Buku --}}
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-700 truncate" style="max-width: 200px;" title="{{ $payment->borrowing->bookCopy->book->title ?? 'Buku Dihapus' }}">
                                         {{ $payment->borrowing->bookCopy->book->title ?? 'Buku Dihapus' }}
-                                    </span>
-                                    <span class="d-block text-muted" style="font-size: 0.8em;">
+                                    </div>
+                                    <div class="text-[10px] font-mono text-gray-400 mt-0.5 tracking-wider">
                                         {{ $payment->borrowing->bookCopy->book_code ?? '-' }}
+                                    </div>
+                                </td>
+
+                                {{-- Nominal --}}
+                                <td class="px-6 py-4 text-right">
+                                    <span class="inline-flex items-center gap-1 text-sm font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                                        <span>+</span> Rp {{ number_format($payment->amount_paid, 0, ',', '.') }}
                                     </span>
                                 </td>
 
-                                <td class="px-3 text-end fw-bold text-success">
-                                    + Rp{{ number_format($payment->amount_paid, 0, ',', '.') }}
-                                </td>
-
-                                <td class="px-3 text-center">
-                                    <span class="badge bg-light text-dark border">
-                                        {{ $payment->processedBy->name ?? 'System' }}
+                                {{-- Petugas --}}
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        {{ $payment->processedBy->name ?? 'Sistem' }}
                                     </span>
                                 </td>
-                                
-                                <td class="px-3 text-center">
-                                    @if($payment->borrowing->fine_status == 'paid')
-                                        <span class="badge bg-success bg-opacity-10 text-success px-2 py-1">Lunas</span>
+
+                                {{-- Status Lunas/Belum --}}
+                                <td class="px-6 py-4 text-center">
+                                    @if(optional($payment->borrowing)->fine_status == 'paid')
+                                        <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-widest">
+                                            Lunas
+                                        </span>
                                     @else
-                                        <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1">Belum Lunas</span>
+                                        <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-widest">
+                                            Belum Lunas
+                                        </span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
-                                    <i class="bi bi-wallet2 d-block fs-1 mb-2 opacity-50"></i>
-                                    Belum ada data pembayaran denda.
+                                <td colspan="6" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <span class="text-5xl mb-4 opacity-50">🧾</span>
+                                        <h3 class="text-lg font-bold text-gray-900">Belum ada riwayat</h3>
+                                        <p class="text-gray-500 mt-1">Belum ada data pembayaran denda yang tercatat.</p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
-                    
+
+                    {{-- Total Footer --}}
                     @if($payments->isNotEmpty())
-                    <tfoot class="table-light fw-bold">
-                        <tr>
-                            <td colspan="4" class="px-3 py-2 text-end">Total Uang Masuk (Halaman ini):</td>
-                            <td class="px-3 py-2 text-end text-success">
-                                Rp {{ number_format($totalIncome, 0, ',', '.') }}
-                            </td>
-                            <td class="px-3 py-2" colspan="2"></td>
-                        </tr>
-                    </tfoot>
+                        <tfoot class="bg-slate-50 border-t border-gray-100">
+                            <tr>
+                                <td colspan="3" class="px-6 py-5 text-right text-xs font-extrabold text-gray-500 uppercase tracking-wider">
+                                    Total Uang Masuk (Sesuai Filter):
+                                </td>
+                                <td class="px-6 py-5 text-right text-lg font-extrabold text-emerald-600">
+                                    Rp {{ number_format($totalIncome, 0, ',', '.') }}
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
                     @endif
                 </table>
             </div>
 
+            {{-- Pagination --}}
             @if ($payments->hasPages())
-                 <div class="card-footer bg-white border-top-0 py-2">
-                     {{ $payments->links() }}
-                 </div>
+                <div class="p-6 border-t border-gray-100 bg-white">
+                    {{ $payments->links() }}
+                </div>
             @endif
         </div>
     </div>
-</div>
 @endsection

@@ -1,113 +1,118 @@
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-t">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Riwayat Peminjaman Saya - Perpustakaan Multicomp</title>
+@extends('layouts.admin')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+@section('content')
+    {{-- Header Halaman --}}
+    <div class="mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Riwayat Peminjaman</h2>
+        <p class="text-gray-500 mt-1 font-medium">Pantau daftar buku yang sedang dan pernah Anda pinjam di sini.</p>
+    </div>
 
-    <style>
-        :root { --brand-red: #c62828; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('catalog.index') }}" style="color: var(--brand-red);">
-                Perpustakaan Multicomp
-            </a>
-            <div>
-                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary">Kembali ke Dashboard</a>
-            </div>
+    {{-- Alert Notifikasi --}}
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3">
+            <span class="text-xl">✅</span> {{ session('success') }}
         </div>
-    </nav>
+    @endif
 
-    <main class="container my-4">
-        <div class="mb-4">
-            <h1 class="h3 fw-bold">Riwayat Peminjaman Saya</h1>
-            <p class="text-muted">Daftar buku yang sedang dan pernah Anda pinjam.</p>
-        </div>
+    {{-- Kontainer Tabel Utama --}}
+    <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50/50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">No.</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Judul Buku</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Kode Buku</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Tgl Pinjam</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Jatuh Tempo</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Tgl Kembali</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($borrowings as $index => $borrow)
+                        @php
+                            $isOverdue = $borrow->status == 'dipinjam' && \Carbon\Carbon::parse($borrow->due_at)->lt(now());
+                            $isRejected = $borrow->status == 'rejected';
+                        @endphp
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+                        <tr class="hover:bg-gray-50/50 transition duration-200 {{ $isRejected ? 'opacity-60' : '' }}">
+                            <td class="px-6 py-4 text-sm text-gray-600 font-medium">
+                                {{ $index + 1 }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm font-bold text-gray-900 line-clamp-2">
+                                    {{ $borrow->bookCopy->book->title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold font-mono">
+                                    {{ $borrow->bookCopy->book_code }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 font-medium">
+                                {{ \Carbon\Carbon::parse($borrow->borrowed_at)->format('d M Y') }}
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium {{ $isOverdue ? 'text-red-600 font-bold' : 'text-gray-600' }}">
+                                {{ $borrow->due_at ? \Carbon\Carbon::parse($borrow->due_at)->format('d M Y') : '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 font-medium">
+                                @if($borrow->returned_at)
+                                    {{ \Carbon\Carbon::parse($borrow->returned_at)->format('d M Y') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @switch($borrow->status)
+                                    @case('pending')
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold border border-amber-100">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Menunggu
+                                        </span>
+                                        @break
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No.</th>
-                                <th>Judul Buku</th>
-                                <th>Kode Eksemplar</th>
-                                <th>Tanggal Pinjam</th>
-                                <th>Jatuh Tempo</th>
-                                <th>Tanggal Kembali</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($borrowings as $index => $borrow)
-                                @php
-                                    // SINKRONISASI STATUS: Menggunakan 'dipinjam' dari Controller
-                                    $isOverdue = $borrow->status == 'dipinjam' && \Carbon\Carbon::parse($borrow->due_at)->lt(now());
-                                @endphp
-                                <tr class="{{ $borrow->status == 'rejected' ? 'text-muted' : '' }}">
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $borrow->bookCopy->book->title }}</td>
-                                    <td>{{ $borrow->bookCopy->book_code }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($borrow->borrowed_at)->format('d M Y') }}</td>
-                                    <td>{{ $borrow->due_at ? \Carbon\Carbon::parse($borrow->due_at)->format('d M Y') : '-' }}</td>
-                                    <td>
-                                        @if($borrow->returned_at)
-                                            {{ \Carbon\Carbon::parse($borrow->returned_at)->format('d M Y') }}
+                                    @case('rejected')
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-100">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Ditolak
+                                        </span>
+                                        @break
+
+                                    @case('dipinjam')
+                                        @if($isOverdue)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-700 text-xs font-bold border border-red-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Terlambat
+                                            </span>
                                         @else
-                                            -
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Dipinjam
+                                            </span>
                                         @endif
-                                    </td>
-                                    <td>
-                                        @switch($borrow->status)
-                                            @case('pending')
-                                                <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
-                                                @break
-                                            
-                                            @case('rejected')
-                                                <span class="badge bg-danger">Ditolak</span>
-                                                @break
+                                        @break
 
-                                            {{-- PERUBAHAN UTAMA: Menggunakan status 'dipinjam' --}}
-                                            @case('dipinjam')
-                                                @if($isOverdue)
-                                                    <span class="badge bg-danger">Terlambat</span>
-                                                @else
-                                                    <span class="badge bg-primary">Sedang Meminjam</span>
-                                                @endif
-                                                @break
-
-                                            @case('returned')
-                                                <span class="badge bg-success">Dikembalikan</span>
-                                                @break
-                                        @endswitch
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">
-                                        Anda belum memiliki riwayat peminjaman.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    @case('returned')
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Kembali
+                                        </span>
+                                        @break
+                                @endswitch
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <span class="text-4xl mb-3">📭</span>
+                                    <h3 class="text-lg font-bold text-gray-900">Belum ada riwayat</h3>
+                                    <p class="text-gray-500 mt-1">Anda belum pernah meminjam buku. Yuk, mulai membaca!</p>
+                                    <a href="{{ route('catalog.index') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition">
+                                        Lihat Katalog Buku
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    </div>
+@endsection

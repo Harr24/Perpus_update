@@ -1,66 +1,55 @@
 @extends('layouts.admin')
 
 @section('content')
-    {{-- Header Halaman --}}
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">
-            Tambah Jadwal Petugas
-        </h1>
-        <a href="{{ route('admin.superadmin.schedules.index') }}" class="inline-flex items-center bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg shadow-sm transition-colors">
-            Kembali ke Daftar
-        </a>
-    </div>
+    <div class="max-w-2xl mx-auto">
 
-    {{-- 
-        ==========================================================
-        --- KARTU FORM DENGAN TAILWIND ---
-        ==========================================================
-    --}}
-    <div class="max-w-3xl mx-auto">
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Tambah Jadwal</h2>
+                <p class="text-gray-500 mt-1 font-medium">Tentukan hari jaga dan petugas yang bertugas pada hari tersebut.</p>
+            </div>
+            <a href="{{ route('admin.superadmin.schedules.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
+        </div>
+
+        {{-- Form Card --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-slate-900 p-6">
+                <h3 class="text-lg font-extrabold text-white">Formulir Jadwal Baru</h3>
+            </div>
+
             <form action="{{ route('admin.superadmin.schedules.store') }}" method="POST">
                 @csrf
-                
-                {{-- Header Kartu (Merah) --}}
-                <div class="bg-red-700 p-4">
-                    <h3 class="text-lg font-bold text-white">
-                        Formulir Jadwal Baru
-                    </h3>
-                </div>
 
-                {{-- Body Kartu (Form) --}}
-                <div class="p-6 space-y-6">
-                    
-                    {{-- Dropdown Pilih Petugas --}}
+                <div class="p-8 space-y-6">
+                    {{-- Pilih Petugas --}}
                     <div>
-                        <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2">
-                            Pilih Petugas
+                        <label for="user_id" class="block text-sm font-bold text-gray-700 mb-2">
+                            Pilih Petugas <span class="text-rose-500">*</span>
                         </label>
-                        <select name="user_id" id="user_id" 
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm @error('user_id') border-red-500 @enderror" 
-                                required>
+                        <select name="user_id" id="user_id" required
+                                class="w-full px-4 py-3 rounded-xl border @error('user_id') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer font-medium text-gray-700">
                             <option value="">-- Pilih Petugas --</option>
                             @foreach($staff as $user)
                                 <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} (Petugas)
+                                    {{ $user->name }}
                                 </option>
                             @endforeach
                         </select>
-                        
                         @error('user_id')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Dropdown Pilih Hari --}}
+                    {{-- Pilih Hari --}}
                     <div>
-                        <label for="day_of_week" class="block text-sm font-medium text-gray-700 mb-2">
-                            Pilih Hari
+                        <label for="day_of_week" class="block text-sm font-bold text-gray-700 mb-2">
+                            Pilih Hari <span class="text-rose-500">*</span>
                         </label>
-                        <select name="day_of_week" id="day_of_week" 
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm @error('day_of_week') border-red-500 @enderror" 
-                                required>
+                        <select name="day_of_week" id="day_of_week" required
+                                class="w-full px-4 py-3 rounded-xl border @error('day_of_week') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer font-medium text-gray-700">
                             <option value="">-- Pilih Hari --</option>
                             @foreach($days as $dayNumber => $dayName)
                                 <option value="{{ $dayNumber }}" {{ old('day_of_week') == $dayNumber ? 'selected' : '' }}>
@@ -68,24 +57,21 @@
                                 </option>
                             @endforeach
                         </select>
-                        
                         @error('day_of_week')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
                         @enderror
                     </div>
-
                 </div>
 
-                {{-- Footer Kartu (Tombol Aksi) --}}
-                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
-                    <a href="{{ route('admin.superadmin.schedules.index') }}" class="inline-flex items-center bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg shadow-sm transition-colors">
+                {{-- Tombol Aksi --}}
+                <div class="bg-gray-50 p-6 flex items-center justify-end gap-4 border-t border-gray-100">
+                    <a href="{{ route('admin.superadmin.schedules.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition shadow-sm text-sm">
                         Batal
                     </a>
-                    <button type="submit" class="inline-flex items-center bg-red-700 hover:bg-red-800 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-sm transition-colors">
+                    <button type="submit" class="inline-flex items-center justify-center bg-slate-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-slate-800 transition shadow-sm hover:shadow-md text-sm">
                         Simpan Jadwal
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

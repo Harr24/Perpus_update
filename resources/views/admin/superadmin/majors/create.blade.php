@@ -1,48 +1,48 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Jurusan Baru')
-
 @section('content')
-<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
 
-    <!-- Judul dan Tombol Kembali -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Tambah Jurusan Baru</h1>
-        <a href="{{ route('admin.superadmin.majors.index') }}" 
-           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
-            &larr; Kembali ke Daftar
-        </a>
-    </div>
-
-    <!-- Formulir -->
-    <div class="bg-white shadow-xl rounded-lg p-6 md:p-8">
-        <form action="{{ route('admin.superadmin.majors.store') }}" method="POST">
-            @csrf
-
-            <!-- Input Nama Jurusan -->
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama Jurusan</label>
-                <input type="text" name="name" id="name" 
-                       class="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-red-500 @error('name') border-red-500 @enderror" 
-                       value="{{ old('name') }}" 
-                       placeholder="Contoh: Rekayasa Perangkat Lunak 1"
-                       required>
-                
-                <!-- Pesan Error Validasi -->
-                @error('name')
-                    <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-                @enderror
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Tambah Jurusan</h2>
+                <p class="text-gray-500 mt-1 font-medium">Tambahkan data jurusan baru untuk pengelompokan kelas siswa.</p>
             </div>
+            <a href="{{ route('admin.superadmin.majors.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
+        </div>
 
-            <!-- Tombol Simpan -->
-            <div class="flex justify-end mt-6">
-                <button type="submit" 
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out">
-                    Simpan Jurusan
-                </button>
-            </div>
-        </form>
+        {{-- Form Card Utama --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-8">
+            <form action="{{ route('admin.superadmin.majors.store') }}" method="POST">
+                @csrf
+
+                {{-- Nama Jurusan --}}
+                <div class="mb-8">
+                    <label for="name" class="block text-sm font-bold text-gray-700 mb-2">
+                        Nama Jurusan <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                           placeholder="Contoh: Rekayasa Perangkat Lunak 1"
+                           class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                    @error('name')
+                        <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center justify-center bg-slate-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-slate-800 transition shadow-sm hover:shadow-md">
+                        Simpan Jurusan
+                    </button>
+                    <a href="{{ route('admin.superadmin.majors.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-50 transition shadow-sm">
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+
     </div>
-
-</div>
 @endsection

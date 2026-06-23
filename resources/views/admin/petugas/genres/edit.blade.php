@@ -1,251 +1,189 @@
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Genre - {{ $genre->name }}</title>
+@extends('layouts.admin')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+@section('content')
+    <div class="max-w-7xl mx-auto">
 
-    {{-- Script SweetAlert2 untuk Pop-up Hapus --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        :root{
-            --brand-red: #c62828;
-            --brand-red-dark: #a21f1f;
-        }
-        body{ 
-            font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial; 
-            background:#f8f9fa; 
-        }
-        
-        /* HEADER STYLE */
-        .topbar{ 
-            background: var(--brand-red); 
-            color:#fff; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .initials-avatar {
-            width: 44px;
-            height: 44px;
-            background-color: rgba(255,255,255,0.2); 
-            color: #fff;
-            font-weight: 700;
-        }
-        .btn-logout {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.5);
-            color: rgba(255,255,255,0.8);
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease;
-        }
-        .btn-logout:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        label.required::after{ content: " *"; color:#d11; }
-        .help-text{ font-size:0.9rem; color:#6c757d; }
-    </style>
-</head>
-<body>
-
-    <header class="topbar py-3">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center initials-avatar">
-                    {{ Str::upper(substr(Auth::user()->name, 0, 2)) }}
-                </div>
-                <div>
-                    <div class="small text-white-50">Selamat Datang,</div>
-                    <div class="h6 mb-0 text-white fw-bold">{{ Auth::user()->name }}</div>
-                </div>
-            </div>
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn-logout">
-                        <i class="bi bi-box-arrow-right me-1"></i> LOGOUT
-                    </button>
-                </form>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Genre</h2>
+                <p class="text-gray-500 mt-1 font-medium">Perbarui informasi untuk genre: <strong class="text-slate-800">{{ $genre->name }}</strong></p>
             </div>
+            <a href="{{ route('admin.petugas.genres.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-    </header>
 
-    <main class="container py-5">
-        <div class="row g-4 g-lg-5">
-            
-            {{-- Kolom Form Utama (Kiri) --}}
-            <div class="col-lg-8">
-                
-                <div class="mb-4">
-                    <h1 class="h3 fw-bold text-gray-800">Edit Genre: {{ $genre->name }}</h1>
-                    <p class="text-muted mb-0">Perbarui nama, kode, atau ikon genre buku.</p>
+        {{-- Alert Sukses --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3 shadow-sm">
+                <span class="text-xl">✅</span> {{ session('success') }}
+            </div>
+        @endif
+
+        {{-- Alert Error Validasi --}}
+        @if($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl shadow-sm">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Terdapat Kesalahan!
                 </div>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-2 space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                @if(session('success'))
-                    <div class="alert alert-success d-flex align-items-center" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        <div>{{ session('success') }}</div>
-                    </div>
-                @endif
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                @if($errors->any())
-                    <div class="alert alert-danger" role="alert">
-                        <h6 class="alert-heading fw-bold">Oops! Ada kesalahan:</h6>
-                        <ul class="mb-0 mt-2">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+            {{-- KOLOM KIRI: FORM UTAMA --}}
+            <div class="lg:col-span-2 space-y-6">
 
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4 p-md-5">
-                        {{-- PENTING: Tambahkan enctype="multipart/form-data" --}}
-                        <form action="{{ route('admin.petugas.genres.update', $genre->id) }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                            @csrf
-                            @method('PUT')
+                {{-- Card Form Update --}}
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-6 sm:p-8">
+                    <form action="{{ route('admin.petugas.genres.update', $genre->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
 
-                            <div class="mb-3">
-                                <label for="genre_code" class="form-label required">Kode Genre (DDC)</label>
-                                <input type="text" id="genre_code" name="genre_code" 
-                                       value="{{ old('genre_code', $genre->genre_code) }}" required
-                                       class="form-control form-control-lg @error('genre_code') is-invalid @enderror" 
-                                       placeholder="Contoh: 000, 100, 200">
-                                @error('genre_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="name" class="form-label required">Nama Genre</label>
-                                <input type="text" id="name" name="name" value="{{ old('name', $genre->name) }}" required
-                                       class="form-control form-control-lg @error('name') is-invalid @enderror" placeholder="Contoh: Fiksi, Sejarah">
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                        <div class="space-y-6 mb-8">
+                            {{-- Kode & Nama Genre (Grid) --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="genre_code" class="block text-sm font-bold text-gray-700 mb-2">Kode Genre (DDC) <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="genre_code" name="genre_code" value="{{ old('genre_code', $genre->genre_code) }}" required
+                                           placeholder="Contoh: 800"
+                                           class="w-full px-4 py-3 rounded-xl border @error('genre_code') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white font-mono">
+                                </div>
+
+                                <div>
+                                    <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nama Genre <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="name" name="name" value="{{ old('name', $genre->name) }}" required
+                                           placeholder="Contoh: Fiksi Klasik"
+                                           class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                                </div>
                             </div>
 
-                            {{-- TAMBAHAN: Input Edit Icon --}}
-                            <div class="mb-4">
-                                <label for="icon" class="form-label">Ikon Kategori (Opsional)</label>
-                                
-                                {{-- Preview Icon Lama --}}
+                            {{-- Upload Ikon --}}
+                            <div>
+                                <label for="icon" class="block text-sm font-bold text-gray-700 mb-2">Ikon Kategori (Opsional)</label>
+
                                 @if($genre->icon)
-                                    <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $genre->icon) }}" alt="Current Icon" class="img-thumbnail" style="height: 80px; width: 80px; object-fit: cover;">
-                                        <div class="small text-muted mt-1">Icon saat ini</div>
+                                    <div class="mb-4 flex items-center gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
+                                            <img src="{{ asset('storage/' . $genre->icon) }}" alt="Icon Saat Ini" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-900">Ikon Saat Ini</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">Akan diganti jika Anda mengunggah gambar baru.</p>
+                                        </div>
                                     </div>
                                 @endif
 
-                                <input type="file" id="icon" name="icon" class="form-control @error('icon') is-invalid @enderror" accept="image/*">
-                                <div class="form-text help-text">Biarkan kosong jika tidak ingin mengubah icon. (Format: JPG, PNG, SVG. Max 2MB)</div>
-                                @error('icon')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="file" id="icon" name="icon" accept="image/*"
+                                       class="block w-full text-sm text-gray-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer border border-gray-200 rounded-xl p-1 transition @error('icon') border-rose-500 @enderror bg-white">
+                                <p class="mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">Format: JPG, PNG, SVG (Max 2MB).</p>
                             </div>
+                        </div>
 
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-danger btn-lg">
-                                    <i class="bi bi-save me-1"></i> Update
-                                </button>
-                                <a href="{{ route('admin.petugas.genres.index') }}" class="btn btn-outline-secondary btn-lg">
-                                    Kembali
-                                </a>
-                            </div>
-                        </form>
-                        
-                        {{-- Form Hapus --}}
-                        <form action="{{ route('admin.petugas.genres.destroy', $genre->id) }}" method="POST" id="delete-form" class="mt-4 border-top pt-4">
+                        {{-- Tombol Submit --}}
+                        <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                            <button type="submit" class="inline-flex items-center justify-center bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-md text-sm">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Card Danger Zone (Hapus) --}}
+                <div class="bg-rose-50 rounded-[1.5rem] border border-rose-100 p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h4 class="text-base font-extrabold text-rose-900">Danger Zone</h4>
+                            <p class="text-sm text-rose-700 mt-1">Hapus genre ini secara permanen dari sistem perpustakaan.</p>
+                        </div>
+                        <form action="{{ route('admin.petugas.genres.destroy', $genre->id) }}" method="POST" id="delete-form" class="m-0 shrink-0">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger">
-                                <i class="bi bi-trash me-1"></i> Hapus Genre Ini
+                            <button type="submit" class="inline-flex items-center justify-center bg-white text-rose-600 border border-rose-200 font-bold py-2.5 px-6 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm text-sm">
+                                🗑️ Hapus Genre
                             </button>
                         </form>
                     </div>
                 </div>
+
             </div>
 
-            {{-- Kolom Sidebar (Kanan) --}}
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-start border-danger border-4 mb-4">
-                    <div class="card-body">
-                        <h6 class="mb-2 fw-bold text-danger">Ringkasan Cepat</h6>
-                        <p class="mb-1"><strong>Total Genre:</strong> {{ \App\Models\Genre::count() }}</p>
-                        <p class="mb-0 text-muted small">Icon akan muncul di halaman katalog pengunjung.</p>
+            {{-- KOLOM KANAN: SIDEBAR INFO --}}
+            <div class="lg:col-span-1 space-y-6">
+
+                {{-- Statistik Cepat --}}
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-6 border-t-4 border-t-emerald-500">
+                    <h6 class="mb-3 font-extrabold text-gray-900 flex items-center gap-2">
+                        <span>📊</span> Ringkasan
+                    </h6>
+                    <div class="flex justify-between items-center bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                        <span class="text-sm font-bold text-emerald-800">Total Genre Aktif</span>
+                        <span class="text-2xl font-extrabold text-emerald-600">{{ \App\Models\Genre::count() }}</span>
                     </div>
+                    <p class="mt-4 text-xs text-gray-500 font-medium leading-relaxed">Ikon genre akan dimunculkan secara publik di halaman katalog utama pengunjung.</p>
                 </div>
 
-                <div class="card shadow-sm border-start border-primary border-4">
-                    <div class="card-body">
-                        <h6 class="mb-3 fw-bold text-primary">Petunjuk</h6>
-                        <ul class="list-unstyled mb-0 small text-muted">
-                            <li class="mb-2 d-flex">
-                                <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
-                                <span>Nama genre wajib diisi dan unik.</span>
-                            </li>
-                            <li class="mb-2 d-flex">
-                                <i class="bi bi-image text-primary me-2 mt-1"></i>
-                                <span>Gunakan gambar transparan (PNG/SVG) agar lebih rapi.</span>
-                            </li>
-                            <li class="d-flex">
-                                <i class="bi bi-exclamation-triangle-fill text-warning me-2 mt-1"></i>
-                                <span>Gunakan tombol Hapus hanya jika tidak ada buku yang terhubung.</span>
-                            </li>
-                        </ul>
-                    </div>
+                {{-- Petunjuk --}}
+                <div class="bg-slate-900 rounded-[1.5rem] shadow-sm border border-slate-800 p-6 text-slate-300">
+                    <h6 class="mb-4 font-extrabold text-white flex items-center gap-2">
+                        <span class="text-amber-400">💡</span> Petunjuk
+                    </h6>
+                    <ul class="space-y-4 text-sm font-medium">
+                        <li class="flex gap-3">
+                            <span class="text-emerald-400 shrink-0">✓</span>
+                            <span>Nama dan Kode (DDC) genre wajib diisi dan unik.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-sky-400 shrink-0">ℹ️</span>
+                            <span>Sangat disarankan menggunakan gambar berlatar transparan (PNG/SVG) untuk ikon.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-rose-400 shrink-0">⚠️</span>
+                            <span>Pastikan tidak ada buku yang terhubung dengan genre ini sebelum melakukan penghapusan.</span>
+                        </li>
+                    </ul>
                 </div>
+
             </div>
-            
+
         </div>
-    </main>
+    </div>
+@endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
+    {{-- SweetAlert2 untuk Konfirmasi Hapus --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        (function () {
-          'use strict'
-          var forms = document.querySelectorAll('.needs-validation')
-          Array.prototype.slice.call(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-              if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
-              }
-              form.classList.add('was-validated')
-            }, false)
-          })
-        })();
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForm = document.getElementById('delete-form');
 
-        const deleteForm = document.getElementById('delete-form');
-        if (deleteForm) {
-            deleteForm.addEventListener('submit', function (event) {
-                event.preventDefault(); 
-                
-                Swal.fire({
-                    title: 'Hapus Genre Ini?',
-                    text: "Apakah Anda yakin ingin menghapus genre '{{ $genre->name }}'? Tindakan ini tidak dapat dibatalkan.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#c62828', 
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        deleteForm.submit(); 
-                    }
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Hapus Genre Ini?',
+                        html: "Apakah Anda yakin ingin menghapus genre <strong>'{{ $genre->name }}'</strong>?<br><span class='text-sm text-rose-500 mt-2 block'>Tindakan ini tidak dapat dibatalkan.</span>",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e11d48', // Rose-600
+                        cancelButtonColor: '#6b7280',  // Gray-500
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal',
+                        borderRadius: '1.5rem'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            deleteForm.submit();
+                        }
+                    });
                 });
-            });
-        }
+            }
+        });
     </script>
-</body>
-</html>
+@endpush

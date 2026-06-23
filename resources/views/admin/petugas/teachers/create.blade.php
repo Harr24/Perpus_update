@@ -1,140 +1,137 @@
-@extends('layouts.app') {{-- Menggunakan layout yang Anda berikan --}}
+@extends('layouts.admin')
 
 @section('content')
-<div class="p-6 bg-gray-50 min-h-screen">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Buat Akun Guru Baru</h1>
-        <p class="text-gray-500 mt-1">Isi form di bawah untuk mendaftarkan akun guru.</p>
-    </div>
+    <div class="max-w-3xl mx-auto">
 
-    {{-- Menampilkan error validasi (jika ada) --}}
-    @if($errors->any())
-        <div class="mb-4 p-4 bg-red-100 text-red-800 border-l-4 border-red-500 rounded-r-lg shadow">
-            <strong class="font-bold">Oops! Ada kesalahan:</strong>
-            <ul class="list-disc list-inside mt-2">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Tambah Guru Baru</h2>
+                <p class="text-gray-500 mt-1 font-medium">Buatkan akun akses untuk guru agar bisa masuk ke sistem.</p>
+            </div>
+            <a href="{{ route('admin.petugas.teachers.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-    @endif
 
-    {{-- 
-        ==========================================================
-        --- REVISI: Desain Form Menggunakan Tailwind
-        ==========================================================
-    --}}
-    <div class="bg-white shadow-lg rounded-xl overflow-hidden max-w-2xl">
-        
-        {{-- TAMBAHAN: Memberi ID pada form untuk SweetAlert --}}
-        <form action="{{ route('admin.petugas.teachers.store') }}" method="POST" id="create-teacher-form">
-            @csrf
-            
-            <div class="p-6 space-y-6">
+        {{-- Alert Error Validasi --}}
+        @if($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Gagal Memproses!
+                </div>
+                <p class="text-sm font-medium text-rose-600 mb-2">Terdapat kesalahan pada data yang Anda masukkan:</p>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-2 space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            {{-- Ikon Peringatan --}}
-                            <svg class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                            </svg>
+        {{-- Form Card Utama --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-8">
+            <form action="{{ route('admin.petugas.teachers.store') }}" method="POST" id="create-teacher-form">
+                @csrf
+
+                {{-- Catatan Pengingat --}}
+                <div class="mb-8 p-4 bg-amber-50 border border-amber-100 rounded-xl flex gap-3 text-sm text-amber-800 leading-relaxed">
+                    <span class="text-xl shrink-0">💡</span>
+                    <p><strong>Catatan Penting:</strong> Pastikan Anda memberi tahu guru yang bersangkutan terkait <strong>email</strong> dan <strong>password</strong> sementara yang Anda buatkan di bawah ini agar mereka bisa login.</p>
+                </div>
+
+                <div class="space-y-6 mb-8">
+                    {{-- Nama Lengkap --}}
+                    <div>
+                        <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap <span class="text-rose-500">*</span></label>
+                        <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                               placeholder="Masukkan nama lengkap guru"
+                               class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                        @error('name') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Email & Mata Pelajaran (Grid) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Alamat Email <span class="text-rose-500">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                                   placeholder="guru@sekolah.com"
+                                   class="w-full px-4 py-3 rounded-xl border @error('email') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('email') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                <strong>Catatan:</strong> Pastikan Anda memberi tahu guru yang bersangkutan <strong>email</strong> dan <strong>password</strong> yang Anda buatkan.
-                            </p>
+
+                        <div>
+                            <label for="subject" class="block text-sm font-bold text-gray-700 mb-2">Mata Pelajaran <span class="text-rose-500">*</span></label>
+                            <input type="text" id="subject" name="subject" value="{{ old('subject') }}" required
+                                   placeholder="Contoh: Matematika"
+                                   class="w-full px-4 py-3 rounded-xl border @error('subject') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('subject') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="h-px bg-gray-100 my-6"></div>
+
+                    {{-- Password & Konfirmasi (Grid) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="password" class="block text-sm font-bold text-gray-700 mb-2">Password Sementara <span class="text-rose-500">*</span></label>
+                            <input type="password" id="password" name="password" required
+                                   placeholder="Minimal 8 karakter"
+                                   class="w-full px-4 py-3 rounded-xl border @error('password') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('password') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-bold text-gray-700 mb-2">Konfirmasi Password <span class="text-rose-500">*</span></label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" required
+                                   placeholder="Ulangi password"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 outline-none transition bg-gray-50 focus:bg-white">
                         </div>
                     </div>
                 </div>
-                {{-- Input Nama Lengkap --}}
-                <div>
-                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nama Lengkap:</label>
-                    <input type="text" id="name" name="name" value="{{ old('name') }}" 
-                           class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('name') border-red-500 @enderror" 
-                           required>
-                    @error('name') <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p> @enderror
-                </div>
 
-                {{-- Input Email --}}
-                <div>
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" 
-                           class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('email') border-red-500 @enderror" 
-                           required>
-                    @error('email') <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p> @enderror
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center justify-center bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-md text-sm">
+                        Buat Akun Guru
+                    </button>
+                    <a href="{{ route('admin.petugas.teachers.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                        Batal
+                    </a>
                 </div>
-
-                {{-- Input Mata Pelajaran --}}
-                <div>
-                    <label for="subject" class="block text-gray-700 text-sm font-bold mb-2">Mata Pelajaran:</label>
-                    <input type="text" id="subject" name="subject" value="{{ old('subject') }}" 
-                           class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('subject') border-red-500 @enderror" 
-                           required>
-                    @error('subject') <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- Input Password --}}
-                <div>
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                    <input type="password" id="password" name="password" 
-                           class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('password') border-red-500 @enderror" 
-                           required>
-                    @error('password') <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- Input Konfirmasi Password --}}
-                <div>
-                    <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Password:</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" 
-                           class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500" 
-                           required>
-                </div>
-            </div>
-
-            {{-- Footer Tombol --}}
-            <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
-                <a href="{{ route('admin.petugas.teachers.index') }}" class="text-gray-600 hover:text-gray-800 font-medium text-sm">Kembali</a>
-                <button type="submit" 
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-                    Buat Akun
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
-
-{{-- 
-    ==========================================================
-    --- TAMBAHAN: Script SweetAlert untuk Konfirmasi ---
-    ==========================================================
---}}
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    // Ambil form berdasarkan ID
-    const form = document.getElementById('create-teacher-form');
-    
-    if (form) {
-        form.addEventListener('submit', function (event) {
-            event.preventDefault(); // Hentikan submit
-            
-            Swal.fire({
-                title: 'Buat Akun Guru?',
-                text: "Pastikan data yang Anda masukkan sudah benar.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626', // Warna merah (bg-red-600)
-                cancelButtonColor: '#6B7280',  // Warna abu-abu (text-gray-500)
-                confirmButtonText: 'Ya, Buat Akun!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); // Lanjutkan submit jika dikonfirmasi
-                }
-            });
-        });
-    }
-</script>
 @endsection
+
+@push('scripts')
+    {{-- SweetAlert untuk Konfirmasi --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('create-teacher-form');
+
+            if (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Buat Akun Guru?',
+                        text: "Pastikan email dan data mata pelajaran sudah benar.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#059669', // Emerald-600
+                        cancelButtonColor: '#6b7280', // Gray-500
+                        confirmButtonText: 'Ya, Buat Akun!',
+                        cancelButtonText: 'Batal',
+                        borderRadius: '1.5rem'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+@endpush

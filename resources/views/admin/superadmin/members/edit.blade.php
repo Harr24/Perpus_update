@@ -1,250 +1,254 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-{{-- 
-==========================================================
-Tampilan Halaman (View)
-File: resources/views/admin/superadmin/members/edit.blade.php
-Tujuan: Halaman untuk mengedit anggota (siswa & guru)
-==========================================================
---}}
-<div class="p-4 md:p-6 bg-gray-50 min-h-screen">
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-800">Edit Anggota</h1>
-            <p class="text-gray-500 mt-1">Perbarui data untuk: <span class="font-semibold">{{ $member->name }}</span></p>
+    <div class="max-w-4xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Anggota</h2>
+                <p class="text-gray-500 mt-1 font-medium">Perbarui data informasi untuk akun: <span class="font-bold text-slate-800">{{ $member->name }}</span></p>
+            </div>
+            <a href="{{ route('admin.superadmin.members.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-        <a href="{{ route('admin.superadmin.members.index') }}" class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:-translate-y-px">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-            </svg>
-            Kembali ke Kelola Anggota
-        </a>
-    </div>
 
-    {{-- Tampilkan error validasi umum --}}
-    @if ($errors->any())
-        <div class="mb-4 p-4 bg-red-100 text-red-800 border-l-4 border-red-500 rounded-r-lg shadow" role="alert">
-            <p class="font-bold">Terjadi Kesalahan</p>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>- {{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    {{-- Form Edit --}}
-    <div class="bg-white shadow-md rounded-lg p-4 md:p-6 max-w-3xl mx-auto">
-        <form action="{{ route('admin.superadmin.members.update', $member->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            {{-- ======================== --}}
-            {{-- --- DATA WAJIB UMUM --- --}}
-            {{-- ======================== --}}
-            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Informasi Umum</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Nama --}}
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nama: <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" name="name" value="{{ old('name', $member->name) }}" class="shadow appearance-none border @error('name') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700" required>
-                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        {{-- Alert Error Validasi Umum --}}
+        @if ($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Terdapat Kesalahan:
                 </div>
-
-                {{-- Email --}}
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email: <span class="text-red-500">*</span></label>
-                    <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}" class="shadow appearance-none border @error('email') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700" required>
-                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- Nomor Telepon (Opsional) --}}
-                <div class="mb-4">
-                    <label for="phone_number" class="block text-gray-700 text-sm font-bold mb-2">Nomor Telepon:</label>
-                    <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $member->phone_number) }}" class="shadow appearance-none border @error('phone_number') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700" placeholder="Contoh: 0812...">
-                    @error('phone_number') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- Role --}}
-                <div class="mb-4">
-                    <label for="role" class="block text-gray-700 text-sm font-bold mb-2">Role: <span class="text-red-500">*</span></label>
-                    <select id="role" name="role" class="shadow border rounded w-full py-2 px-3 text-gray-700" required>
-                        <option value="siswa" @selected(old('role', $member->role) == 'siswa')>Siswa</option>
-                        <option value="guru" @selected(old('role', $member->role) == 'guru')>Guru</option>
-                    </select>
-                </div>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-7 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
 
-            {{-- ========================== --}}
-            {{-- --- DETAIL BERDASAR ROLE --- --}}
-            {{-- ========================== --}}
-            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 my-4">Informasi Detail</h3>
+        {{-- Form Card Utama --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-8">
+            <form action="{{ route('admin.superadmin.members.update', $member->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-            {{-- Kolom detail untuk SISWA --}}
-            <div id="student-fields" style="{{ old('role', $member->role) == 'siswa' ? '' : 'display:none;' }}">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {{-- NIS (Wajib untuk Siswa) --}}
-                    <div class="mb-4">
-                        <label for="nis" class="block text-gray-700 text-sm font-bold mb-2">NIS: <span class="text-red-500">*</span></label>
-                        <input type="text" id="nis" name="nis" value="{{ old('nis', $member->nis) }}" class="shadow appearance-none border @error('nis') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700">
-                        @error('nis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    
-                    {{-- Kelas (Wajib untuk Siswa) --}}
-                    <div class="mb-4">
-                        <label for="class" class="block text-gray-700 text-sm font-bold mb-2">Kelas: <span class="text-red-500">*</span></label>
-                        <select id="class" name="class" class="shadow border @error('class') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700">
-                            <option value="">Pilih Tingkat Kelas</option>
-                            <option value="X" @selected(old('class', $member->class) == 'X')>X</option>
-                            <option value="XI" @selected(old('class', $member->class) == 'XI')>XI</option>
-                            <option value="XII" @selected(old('class', $member->class) == 'XII')>XII</option>
-                            {{-- Kita tidak mengizinkan set 'Lulus' secara manual, itu otomatis --}}
-                            @if($member->class == 'Lulus')
-                            <option value="Lulus" @selected(true) disabled>Lulus</option>
-                            @endif
-                        </select>
-                        @error('class') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    
-                    {{-- Jurusan (Wajib untuk Siswa) --}}
-                    <div class="mb-4">
-                        <label for="major" class="block text-gray-700 text-sm font-bold mb-2">Jurusan: <span class="text-red-500">*</span></label>
-                        <select id="major" name="major" class="shadow border @error('major') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700">
-                            <option value="">Pilih Jurusan</option>
-                            {{-- Variabel $majors ini WAJIB dikirim dari MemberController --}}
-                            @if(isset($majors))
-                                @foreach($majors as $major)
-                                    <option value="{{ $major->name }}" @selected(old('major', $member->major) == $major->name)>
-                                        {{ $major->name }}
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                        @error('major') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Kolom detail untuk GURU --}}
-            <div id="teacher-fields" style="{{ old('role', $member->role) == 'guru' ? '' : 'display:none;' }}">
-                <div class="mb-4">
-                    <label for="subject" class="block text-gray-700 text-sm font-bold mb-2">Mata Pelajaran: <span class="text-red-500">*</span></label>
-                    <input type="text" id="subject" name="subject" value="{{ old('subject', $member->subject) }}" class="shadow appearance-none border @error('subject') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700">
-                    @error('subject') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-            
-            {{-- ================== --}}
-            {{-- --- PENGATURAN --- --}}
-            {{-- ================== --}}
-            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 my-4">Pengaturan Akun</h3>
-            
-            {{-- Status Akun --}}
-            <div class="mb-4 max-w-xs">
-                <label for="account_status" class="block text-gray-700 text-sm font-bold mb-2">Status Akun: <span class="text-red-500">*</span></label>
-                <select id="account_status" name="account_status" class="shadow border rounded w-full py-2 px-3 text-gray-700" required>
-                    <option value="pending" @selected(old('account_status', $member->account_status) == 'pending')>Pending</option>
-                    <option value="active" @selected(old('account_status', $member->account_status) == 'active')>Active</option>
-                    <option value="rejected" @selected(old('account_status', $member->account_status) == 'rejected')>Rejected</option>
-                    <option value="suspended" @selected(old('account_status', $member->account_status) == 'suspended')>Suspended</option>
-                </select>
-            </div>
-            
-            {{-- Update Password (Opsional) --}}
-            <hr class="my-6">
-            <p class="text-gray-600 text-sm mb-4">Isi bagian di bawah ini hanya jika Anda ingin mengubah password anggota.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="mb-4">
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password Baru:</label>
-                    <input type="password" id="password" name="password" class="shadow appearance-none border @error('password') border-red-500 @enderror rounded w-full py-2 px-3 text-gray-700">
-                    @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+                {{-- ========================================== --}}
+                {{-- BAGIAN 1: INFORMASI UMUM --}}
+                {{-- ========================================== --}}
                 <div class="mb-6">
-                    <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Password Baru:</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span>👤</span> Informasi Umum
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Nama --}}
+                        <div>
+                            <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap <span class="text-rose-500">*</span></label>
+                            <input type="text" id="name" name="name" value="{{ old('name', $member->name) }}" required
+                                   class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('name') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Email --}}
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Alamat Email <span class="text-rose-500">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}" required
+                                   class="w-full px-4 py-3 rounded-xl border @error('email') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('email') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Nomor Telepon --}}
+                        <div>
+                            <label for="phone_number" class="block text-sm font-bold text-gray-700 mb-2">Nomor Telepon (Opsional)</label>
+                            <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $member->phone_number) }}" placeholder="Contoh: 0812..."
+                                   class="w-full px-4 py-3 rounded-xl border @error('phone_number') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('phone_number') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Role --}}
+                        <div>
+                            <label for="role" class="block text-sm font-bold text-gray-700 mb-2">Role Akun <span class="text-rose-500">*</span></label>
+                            <select id="role" name="role" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer font-semibold text-gray-700">
+                                <option value="siswa" @selected(old('role', $member->role) == 'siswa')>Siswa</option>
+                                <option value="guru" @selected(old('role', $member->role) == 'guru')>Guru</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {{-- Tombol Aksi --}}
-            <div class="flex items-center justify-start gap-4 mt-6">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:-translate-y-px">
-                    Perbarui Anggota
-                </button>
-                <a href="{{ route('admin.superadmin.members.index') }}" class="text-gray-600 hover:text-gray-800 font-medium">Batal</a>
-            </div>
-        </form>
+                <div class="h-px bg-gray-100 my-8"></div>
+
+                {{-- ========================================== --}}
+                {{-- BAGIAN 2: DETAIL BERDASARKAN ROLE --}}
+                {{-- ========================================== --}}
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span>🎓</span> Detail Akademik
+                    </h3>
+
+                    {{-- Form Khusus SISWA --}}
+                    <div id="student-fields" class="transition-all duration-300 {{ old('role', $member->role) == 'siswa' ? '' : 'hidden' }}">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {{-- NIS --}}
+                            <div>
+                                <label for="nis" class="block text-sm font-bold text-gray-700 mb-2">NIS <span class="text-rose-500">*</span></label>
+                                <input type="text" id="nis" name="nis" value="{{ old('nis', $member->nis) }}"
+                                       class="w-full px-4 py-3 rounded-xl border @error('nis') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white font-mono">
+                                @error('nis') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Kelas --}}
+                            <div>
+                                <label for="class" class="block text-sm font-bold text-gray-700 mb-2">Kelas <span class="text-rose-500">*</span></label>
+                                <select id="class" name="class" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer">
+                                    <option value="">Pilih Tingkat Kelas</option>
+                                    <option value="X" @selected(old('class', $member->class) == 'X')>X</option>
+                                    <option value="XI" @selected(old('class', $member->class) == 'XI')>XI</option>
+                                    <option value="XII" @selected(old('class', $member->class) == 'XII')>XII</option>
+                                    @if($member->class == 'Lulus')
+                                        <option value="Lulus" @selected(true) disabled>Alumni / Lulus</option>
+                                    @endif
+                                </select>
+                                @error('class') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            {{-- Jurusan --}}
+                            <div>
+                                <label for="major" class="block text-sm font-bold text-gray-700 mb-2">Jurusan <span class="text-rose-500">*</span></label>
+                                <select id="major" name="major" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer">
+                                    <option value="">Pilih Jurusan</option>
+                                    @if(isset($majors))
+                                        @foreach($majors as $major)
+                                            <option value="{{ $major->name }}" @selected(old('major', $member->major) == $major->name)>
+                                                {{ $major->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('major') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Form Khusus GURU --}}
+                    <div id="teacher-fields" class="transition-all duration-300 {{ old('role', $member->role) == 'guru' ? '' : 'hidden' }}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="subject" class="block text-sm font-bold text-gray-700 mb-2">Mata Pelajaran <span class="text-rose-500">*</span></label>
+                                <input type="text" id="subject" name="subject" value="{{ old('subject', $member->subject) }}" placeholder="Contoh: Matematika"
+                                       class="w-full px-4 py-3 rounded-xl border @error('subject') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                                @error('subject') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-px bg-gray-100 my-8"></div>
+
+                {{-- ========================================== --}}
+                {{-- BAGIAN 3: PENGATURAN AKUN --}}
+                {{-- ========================================== --}}
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span>⚙️</span> Pengaturan Akun
+                    </h3>
+
+                    {{-- Status Akun --}}
+                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2">
+                        <div>
+                            <label for="account_status" class="block text-sm font-bold text-gray-700 mb-2">Status Akun <span class="text-rose-500">*</span></label>
+                            <select id="account_status" name="account_status" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white cursor-pointer font-bold text-gray-700">
+                                <option value="pending" @selected(old('account_status', $member->account_status) == 'pending')>Pending (Menunggu Persetujuan)</option>
+                                <option value="active" @selected(old('account_status', $member->account_status) == 'active')>Active (Aktif)</option>
+                                <option value="rejected" @selected(old('account_status', $member->account_status) == 'rejected')>Rejected (Ditolak)</option>
+                                <option value="suspended" @selected(old('account_status', $member->account_status) == 'suspended')>Suspended (Ditangguhkan)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- Ubah Password --}}
+                    <div class="bg-slate-50 rounded-xl border border-slate-100 p-6">
+                        <h4 class="font-bold text-gray-900 mb-1">Ubah Password <span class="text-sm font-medium text-gray-500">(Opsional)</span></h4>
+                        <p class="text-xs text-gray-500 mb-5">Kosongkan kolom di bawah ini jika Anda tidak ingin mengubah password akun ini.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="password" class="block text-sm font-bold text-gray-700 mb-2">Password Baru</label>
+                                <input type="password" id="password" name="password" placeholder="Isi hanya jika ingin ganti password"
+                                       class="w-full px-4 py-3 rounded-xl border @error('password') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-slate-500 focus:ring-slate-50 @enderror focus:ring-4 outline-none transition bg-white">
+                                @error('password') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="password_confirmation" class="block text-sm font-bold text-gray-700 mb-2">Konfirmasi Password Baru</label>
+                                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Ulangi password baru"
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center justify-center bg-slate-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-slate-800 transition shadow-sm hover:shadow-md">
+                        Update Anggota
+                    </button>
+                    <a href="{{ route('admin.superadmin.members.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-50 transition shadow-sm">
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-{{-- 
-==========================================================
-SCRIPT BARU
-Logika untuk menambah/menghapus 'required' secara dinamis
-==========================================================
---}}
-<script>
-    // Ambil semua elemen yang kita butuhkan
-    const roleSelect = document.getElementById('role');
-    
-    const studentFields = document.getElementById('student-fields');
-    const nisInput = document.getElementById('nis');
-    const classInput = document.getElementById('class');
-    const majorInput = document.getElementById('major');
-    
-    const teacherFields = document.getElementById('teacher-fields');
-    const subjectInput = document.getElementById('subject');
+    {{-- SCRIPT JAVASCRIPT DINAMIS --}}
+    <script>
+        const roleSelect = document.getElementById('role');
+        const studentFields = document.getElementById('student-fields');
+        const teacherFields = document.getElementById('teacher-fields');
 
-    // Fungsi untuk mengatur tampilan dan atribut 'required'
-    function toggleRoleFields() {
-        const selectedRole = roleSelect.value;
+        // Input elemen
+        const nisInput = document.getElementById('nis');
+        const classInput = document.getElementById('class');
+        const majorInput = document.getElementById('major');
+        const subjectInput = document.getElementById('subject');
 
-        if (selectedRole === 'siswa') {
-            // Tampilkan field siswa, sembunyikan field guru
-            studentFields.style.display = 'block';
-            teacherFields.style.display = 'none';
+        function toggleRoleFields() {
+            const selectedRole = roleSelect.value;
 
-            // WAJIBKAN field siswa
-            nisInput.required = true;
-            classInput.required = true;
-            majorInput.required = true;
+            if (selectedRole === 'siswa') {
+                // Tampilkan Siswa, Sembunyikan Guru
+                studentFields.classList.remove('hidden');
+                teacherFields.classList.add('hidden');
 
-            // HAPUS kewajiban field guru
-            subjectInput.required = false;
+                // Wajibkan Siswa
+                nisInput.required = true;
+                classInput.required = true;
+                majorInput.required = true;
 
-        } else if (selectedRole === 'guru') {
-            // Sembunyikan field siswa, tampilkan field guru
-            studentFields.style.display = 'none';
-            teacherFields.style.display = 'block';
+                // Hapus Wajib Guru
+                subjectInput.required = false;
 
-            // HAPUS kewajiban field siswa
-            nisInput.required = false;
-            classInput.required = false;
-            majorInput.required = false;
+            } else if (selectedRole === 'guru') {
+                // Tampilkan Guru, Sembunyikan Siswa
+                teacherFields.classList.remove('hidden');
+                studentFields.classList.add('hidden');
 
-            // WAJIBKAN field guru
-            subjectInput.required = true;
-            
-        } else {
-            // Sembunyikan semua jika tidak terduga
-            studentFields.style.display = 'none';
-            teacherFields.style.display = 'none';
-            
-            // HAPUS semua kewajiban
-            nisInput.required = false;
-            classInput.required = false;
-            majorInput.required = false;
-            subjectInput.required = false;
+                // Hapus Wajib Siswa
+                nisInput.required = false;
+                classInput.required = false;
+                majorInput.required = false;
+
+                // Wajibkan Guru
+                subjectInput.required = true;
+            }
         }
-    }
 
-    // Jalankan fungsi saat dropdown 'role' berubah
-    roleSelect.addEventListener('change', toggleRoleFields);
+        // Jalankan saat dropdown diubah
+        roleSelect.addEventListener('change', toggleRoleFields);
 
-    // Jalankan fungsi saat halaman pertama kali dimuat
-    // untuk mengatur state awal sesuai data dari database
-    document.addEventListener('DOMContentLoaded', toggleRoleFields);
-</script>
+        // Jalankan saat pertama kali dimuat
+        document.addEventListener('DOMContentLoaded', toggleRoleFields);
+    </script>
 @endsection

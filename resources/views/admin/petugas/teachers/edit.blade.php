@@ -1,90 +1,136 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4 py-4">
-    {{-- Header Section --}}
-    <div class="row mb-4">
-        <div class="col-12">
+    <div class="max-w-3xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="h3 fw-bold mb-2 page-title">Edit Akun Guru</h1>
-                <p class="text-muted mb-0 small">Ubah informasi akun untuk guru: <strong class="text-dark">{{ $teacher->name }}</strong></p>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Akun Guru</h2>
+                <p class="text-gray-500 mt-1 font-medium">Perbarui informasi akun untuk guru: <strong class="text-slate-800">{{ $teacher->name }}</strong></p>
             </div>
+            <a href="{{ route('admin.petugas.teachers.index') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-    </div>
 
-    {{-- Main Card --}}
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0 fw-semibold">
-                <i class="bi bi-pencil-square me-2 text-danger"></i>
-                Formulir Perubahan Data
-            </h5>
-        </div>
-        
-        <div class="card-body">
-            <form action="{{ route('admin.petugas.teachers.update', $teacher) }}" method="POST">
+        {{-- Alert Error Validasi --}}
+        @if($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Gagal Memproses!
+                </div>
+                <p class="text-sm font-medium text-rose-600 mb-2">Terdapat kesalahan pada data yang Anda masukkan:</p>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-2 space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- Form Card Utama --}}
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-8">
+            <form action="{{ route('admin.petugas.teachers.update', $teacher) }}" method="POST" id="edit-teacher-form">
                 @csrf
-                @method('PUT') {{-- Wajib untuk metode update --}}
+                @method('PUT')
 
-                {{-- Nama Lengkap --}}
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $teacher->name) }}" required>
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <div class="space-y-6 mb-8">
+                    {{-- Nama Lengkap --}}
+                    <div>
+                        <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap <span class="text-rose-500">*</span></label>
+                        <input type="text" id="name" name="name" value="{{ old('name', $teacher->name) }}" required
+                               class="w-full px-4 py-3 rounded-xl border @error('name') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                        @error('name') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Email & Mata Pelajaran (Grid) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Alamat Email <span class="text-rose-500">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ old('email', $teacher->email) }}" required
+                                   class="w-full px-4 py-3 rounded-xl border @error('email') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('email') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="subject" class="block text-sm font-bold text-gray-700 mb-2">Mata Pelajaran <span class="text-rose-500">*</span></label>
+                            <input type="text" id="subject" name="subject" value="{{ old('subject', $teacher->subject) }}" required
+                                   class="w-full px-4 py-3 rounded-xl border @error('subject') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            @error('subject') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="h-px bg-gray-100 my-8"></div>
+
+                    {{-- Bagian Ubah Password --}}
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                        <div class="mb-4">
+                            <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <span>🔑</span> Ubah Password <span class="text-xs font-medium text-gray-500 ml-1">(Opsional)</span>
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">Kosongkan kedua kolom di bawah ini jika Anda tidak ingin mengubah password akun ini.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="password" class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Password Baru</label>
+                                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter"
+                                       class="w-full px-4 py-3 rounded-xl border @error('password') border-rose-500 ring-rose-50 @else border-gray-200 focus:border-emerald-500 focus:ring-emerald-50 @enderror focus:ring-4 outline-none transition bg-white">
+                                @error('password') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label for="password_confirmation" class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Konfirmasi Password</label>
+                                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Ulangi password baru"
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 outline-none transition bg-white">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Alamat Email --}}
-                <div class="mb-3">
-                    <label for="email" class="form-label">Alamat Email</label>
-                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $teacher->email) }}" required>
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Mata Pelajaran --}}
-                <div class="mb-3">
-                    <label for="subject" class="form-label">Mata Pelajaran</label>
-                    <input type="text" class="form-control @error('subject') is-invalid @enderror" id="subject" name="subject" value="{{ old('subject', $teacher->subject) }}" required>
-                    @error('subject')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <hr class="my-4">
-
-                <p class="text-muted mb-2">
-                    <i class="bi bi-key-fill me-1"></i> <strong>Ubah Password (Opsional)</strong>
-                </p>
-                <small class="d-block text-muted mb-3">Kosongkan kolom password jika Anda tidak ingin mengubahnya.</small>
-
-                {{-- Password Baru --}}
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password Baru</label>
-                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
-                    @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                {{-- Konfirmasi Password --}}
-                <div class="mb-3">
-                    <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
-                </div>
-                
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-save me-2"></i>Simpan Perubahan
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center gap-4 pt-6 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center justify-center bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-md text-sm">
+                        Simpan Perubahan
                     </button>
-                    <a href="{{ route('admin.petugas.teachers.index') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-x-circle me-2"></i>Batal
+                    <a href="{{ route('admin.petugas.teachers.index') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-200 font-bold py-3 px-8 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                        Batal
                     </a>
                 </div>
             </form>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+    {{-- SweetAlert untuk Konfirmasi Edit --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('edit-teacher-form');
+
+            if (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Simpan Perubahan?',
+                        text: "Pastikan data profil guru yang diubah sudah benar.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#059669', // Emerald-600
+                        cancelButtonColor: '#6b7280', // Gray-500
+                        confirmButtonText: 'Ya, Simpan!',
+                        cancelButtonText: 'Batal',
+                        borderRadius: '1.5rem'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+@endpush

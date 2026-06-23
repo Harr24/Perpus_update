@@ -1,95 +1,93 @@
-{{-- Halaman ini akan menampilkan daftar materi yang sudah dibuat guru --}}
-@extends('layouts.app')
-
-@section('styles')
-<style>
-    /* Style untuk memaksa teks panjang (seperti URL) agar pindah baris */
-    .word-break {
-        word-break: break-all;
-    }
-    /* Memberi lebar maksimal pada kolom judul agar tidak terlalu dominan */
-    .table th.title-col {
-        width: 60%;
-    }
-</style>
-@endsection
+@extends('layouts.admin')
 
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    {{-- Header Halaman & Tombol Aksi --}}
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="h3 fw-bold mb-1">Kelola Materi Pembelajaran</h1>
-            <p class="text-muted mb-0">Tambah, edit, atau hapus materi Anda.</p>
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Kelola Materi</h2>
+            <p class="text-gray-500 mt-1 font-medium">Tambah, edit, atau hapus materi yang Anda bagikan.</p>
         </div>
-        {{-- ========================================================== --}}
-        {{-- PERUBAHAN DI SINI: Tombol navigasi ditambahkan --}}
-        {{-- ========================================================== --}}
-        <div class="d-flex gap-2">
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard</a>
-            <a href="{{ route('guru.materials.create') }}" class="btn btn-primary"><i class="bi bi-plus-circle-fill me-2"></i> Tambah Materi Baru</a>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
+            <a href="{{ route('guru.materials.create') }}" class="inline-flex items-center gap-2 bg-rose-600 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-rose-700 transition shadow-sm hover:shadow-md text-sm">
+                <span>➕</span> Tambah Materi
+            </a>
         </div>
-        {{-- ========================================================== --}}
     </div>
 
-    {{-- Notifikasi --}}
+    {{-- Alert Notifikasi --}}
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3">
+            <span class="text-xl">✅</span> {{ session('success') }}
+        </div>
     @endif
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th class="title-col">Judul</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+    {{-- Kontainer Tabel --}}
+    <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50/50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider w-7/12">Judul Materi</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($materials as $material)
+                        <tr class="hover:bg-gray-50/50 transition duration-200">
+                            <td class="px-6 py-4">
+                                <h4 class="text-sm font-bold text-gray-900 mb-1">{{ $material->title }}</h4>
+                                <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-rose-500 hover:text-rose-700 hover:underline break-all line-clamp-1" title="{{ $material->link_url }}">
+                                    {{ $material->link_url }}
+                                </a>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($material->is_active)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold border border-gray-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Tidak Aktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                                <a href="{{ route('guru.materials.edit', $material) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-sm font-bold transition">
+                                    Edit
+                                </a>
+                                <form action="{{ route('guru.materials.destroy', $material) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus materi ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-sm font-bold transition">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($materials as $material)
-                            <tr>
-                                <td>
-                                    <strong class="d-block">{{ $material->title }}</strong>
-                                    <small class="d-block text-muted word-break">
-                                        <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="text-reset">
-                                            {{ Str::limit($material->link_url, 70) }}
-                                        </a>
-                                    </small>
-                                </td>
-                                <td>
-                                    @if($material->is_active)
-                                        <span class="badge bg-success">Aktif</span>
-                                    @else
-                                        <span class="badge bg-secondary">Tidak Aktif</span>
-                                    @endif
-                                </td>
-                                <td class="text-nowrap">
-                                    <a href="{{ route('guru.materials.edit', $material) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('guru.materials.destroy', $material) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus materi ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">Anda belum menambahkan materi apa pun.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            @if ($materials->hasPages())
-            <div class="card-footer bg-transparent border-0">
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <span class="text-4xl mb-3">📚</span>
+                                    <h3 class="text-lg font-bold text-gray-900">Belum ada materi</h3>
+                                    <p class="text-gray-500 mt-1">Anda belum menambahkan materi apa pun untuk siswa.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination --}}
+        @if ($materials->hasPages())
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
                 {{ $materials->links() }}
             </div>
-            @endif
-        </div>
+        @endif
     </div>
-</div>
 @endsection
-

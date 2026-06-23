@@ -1,253 +1,310 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4 py-4">
-    {{-- Header --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold mb-2" style="color: #6f42c1;">Manajemen Tanggal Merah</h1>
-            <p class="text-muted mb-0 small">Kelola daftar hari libur nasional dan cuti bersama.</p>
+    <div class="max-w-7xl mx-auto">
+
+        {{-- Header Halaman --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Tanggal Merah</h2>
+                <p class="text-gray-500 mt-1 font-medium">Kelola daftar hari libur nasional dan cuti bersama dalam sistem.</p>
+            </div>
+            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+            </a>
         </div>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
-    </div>
 
-    {{-- Notifikasi --}}
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+        {{-- Alert Notifikasi --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3">
+                <span class="text-xl">✅</span> {{ session('success') }}
+            </div>
+        @endif
 
-    {{-- Tampilkan Error Validasi (Berlaku untuk 'Tambah' dan 'Edit') --}}
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <h5 class="alert-heading h6"><i class="bi bi-exclamation-triangle-fill me-2"></i> Gagal Memproses!</h5>
-        <p class="mb-2 small">Terdapat kesalahan pada data yang Anda masukkan:</p>
-        <ul class="mb-0 small">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    <div class="row g-4">
-        {{-- Kolom Kiri: Form Tambah Tanggal Merah --}}
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header text-white" style="background-color: #6f42c1;">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-calendar-plus me-2"></i> Tambah Tanggal Merah</h5>
+        {{-- Alert Error Validasi --}}
+        @if($errors->any())
+            <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-xl">
+                <div class="flex items-center gap-2 mb-2 font-bold text-rose-700">
+                    <span class="text-xl">⚠️</span> Gagal Memproses!
                 </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('admin.superadmin.holidays.store') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="holiday_date" class="form-label fw-bold">Tanggal</label>
-                            <input type="date" class="form-control" id="holiday_date" name="holiday_date" value="{{ old('holiday_date') }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label fw-bold">Keterangan</label>
-                            <input type="text" class="form-control" id="description" name="description" value="{{ old('description') }}" placeholder="Contoh: Hari Kemerdekaan RI" required>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary fw-bold" style="background-color: #6f42c1; border: none;">
-                                <i class="bi bi-save me-1"></i> Simpan Tanggal
+                <p class="text-sm font-medium text-rose-600 mb-2">Terdapat kesalahan pada data yang Anda masukkan:</p>
+                <ul class="list-disc list-inside text-sm font-medium text-rose-600 pl-2 space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            {{-- ========================================== --}}
+            {{-- KOLOM KIRI: FORM TAMBAH TANGGAL MERAH --}}
+            {{-- ========================================== --}}
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden sticky top-6">
+                    <div class="p-6 border-b border-gray-100 bg-slate-900">
+                        <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <span>📅</span> Tambah Libur
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="{{ route('admin.superadmin.holidays.store') }}" method="POST">
+                            @csrf
+
+                            {{-- Input Tanggal --}}
+                            <div class="mb-5">
+                                <label for="holiday_date" class="block text-sm font-bold text-gray-700 mb-2">Tanggal Libur <span class="text-rose-500">*</span></label>
+                                <input type="date" id="holiday_date" name="holiday_date" value="{{ old('holiday_date') }}" required
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white text-gray-700 font-medium">
+                            </div>
+
+                            {{-- Input Keterangan --}}
+                            <div class="mb-6">
+                                <label for="description" class="block text-sm font-bold text-gray-700 mb-2">Keterangan <span class="text-rose-500">*</span></label>
+                                <input type="text" id="description" name="description" value="{{ old('description') }}" required
+                                       placeholder="Contoh: Hari Kemerdekaan RI"
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                            </div>
+
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-bold py-3 px-4 rounded-xl hover:bg-slate-800 transition shadow-sm">
+                                Simpan Tanggal
                             </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Kolom Kanan: Daftar Tanggal Merah --}}
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-calendar-check me-2"></i> Daftar Tanggal Merah</h5>
-                    
-                    {{-- Form Filter Tahun --}}
-                    <form action="{{ route('admin.superadmin.holidays.index') }}" method="GET" class="d-flex gap-2">
-                        <select name="year" class="form-select form-select-sm" style="width: 120px;">
-                            @foreach($years as $year)
-                                <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
-                                    Tahun {{ $year }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-filter"></i> Filter
-                        </button>
-                    </form>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+            {{-- ========================================== --}}
+            {{-- KOLOM KANAN: DAFTAR TANGGAL MERAH --}}
+            {{-- ========================================== --}}
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
+
+                    {{-- Header & Filter --}}
+                    <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <h3 class="text-lg font-extrabold text-gray-900 flex items-center gap-2">
+                            <span>📌</span> Daftar Tanggal Merah
+                        </h3>
+
+                        <form action="{{ route('admin.superadmin.holidays.index') }}" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
+                            <select name="year" class="w-full sm:w-40 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-white text-sm font-bold text-gray-700 cursor-pointer shadow-sm">
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                                        Tahun {{ $year }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                                Filter
+                            </button>
+                        </form>
+                    </div>
+
+                    {{-- Tabel --}}
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-white border-b border-gray-100">
                                 <tr>
-                                    <th class="py-3 px-3">Tanggal</th>
-                                    <th class="py-3 px-3">Keterangan</th>
-                                    <th class="py-3 px-3 text-end">Aksi</th>
+                                    <th class="px-6 py-4 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-4 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Keterangan</th>
+                                    <th class="px-6 py-4 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-gray-100">
                                 @forelse ($holidays as $holiday)
-                                <tr>
-                                    <td class="px-3">
-                                        <span class="fw-bold">{{ $holiday->holiday_date->format('d M Y') }}</span>
-                                        <small class="d-block text-muted">{{ $holiday->holiday_date->format('l') }}</small>
-                                    </td>
-                                    <td class="px-3">{{ $holiday->description }}</td>
-                                    <td class="px-3 text-end">
-                                        
-                                        {{-- ============================================= --}}
-                                        {{-- --- TOMBOL BARU: Edit (Membuka Modal) --- --}}
-                                        {{-- ============================================= --}}
-                                        <button type="button" class="btn btn-outline-primary btn-sm btn-edit" 
-                                                title="Edit"
-                                                data-id="{{ $holiday->id }}"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#editHolidayModal">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-
-                                        {{-- Tombol Hapus (Form) --}}
-                                        <form action="{{ route('admin.superadmin.holidays.destroy', $holiday) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus tanggal merah ini?');" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                    <tr class="hover:bg-gray-50/50 transition duration-200">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-gray-900 text-sm mb-0.5">{{ $holiday->holiday_date->format('d M Y') }}</div>
+                                            <div class="text-xs text-rose-500 font-semibold">{{ $holiday->holiday_date->translatedFormat('l') }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-700">
+                                            {{ $holiday->description }}
+                                        </td>
+                                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-2">
+                                                {{-- Tombol Edit (Buka Modal) --}}
+                                                <button type="button" onclick="openEditModal({{ $holiday->id }})" class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-sm font-bold transition">
+                                                    Edit
+                                                </button>
+                                                {{-- Tombol Hapus (Buka Modal Konfirmasi) --}}
+                                                <button type="button" onclick="openDeleteModal('{{ route('admin.superadmin.holidays.destroy', $holiday) }}', '{{ addslashes($holiday->description) }}')" class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-sm font-bold transition">
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">
-                                        Tidak ada data tanggal merah untuk tahun {{ $selectedYear }}.
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-16 text-center">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <span class="text-4xl mb-3">🗓️</span>
+                                                <h3 class="text-base font-bold text-gray-900">Tidak ada tanggal merah</h3>
+                                                <p class="text-sm text-gray-500 mt-1">Belum ada data libur untuk tahun {{ $selectedYear }}.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
-</div>
 
-
-{{-- ============================================= --}}
-{{-- --- MODAL BARU: Edit Tanggal Merah --- --}}
-{{-- ============================================= --}}
-<div class="modal fade" id="editHolidayModal" tabindex="-1" aria-labelledby="editHolidayModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="editHolidayModalLabel">Edit Tanggal Merah</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            
-            {{-- Form Edit akan diisi oleh JavaScript --}}
-            <form id="editHolidayForm" method="POST"> 
-                @csrf
-                @method('PUT')
-                
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="edit_holiday_date" class="form-label fw-bold">Tanggal</label>
-                        {{-- Nama input harus 'edit_holiday_date' agar sesuai validasi di controller --}}
-                        <input type="date" class="form-control" id="edit_holiday_date" name="edit_holiday_date" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_description" class="form-label fw-bold">Keterangan</label>
-                        {{-- Nama input harus 'edit_description' --}}
-                        <input type="text" class="form-control" id="edit_description" name="edit_description" placeholder="Contoh: Hari Kemerdekaan RI" required>
+    {{-- ================================================= --}}
+    {{-- MODAL HAPUS TANGGAL MERAH --}}
+    {{-- ================================================= --}}
+    <div id="deleteModal" class="fixed inset-0 z-[9999] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-md w-full border border-gray-100">
+                <div class="bg-white px-6 pt-6 pb-6">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="text-rose-600 text-xl">⚠️</span>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-extrabold text-gray-900">Hapus Tanggal Merah</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Apakah Anda yakin ingin menghapus data libur <strong id="holidayDesc" class="text-gray-800"></strong>?</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: #6f42c1; border: none;">
-                        <i class="bi bi-save me-1"></i> Simpan Perubahan
+                <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-3">
+                    <form id="deleteForm" action="" method="POST" class="m-0">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="w-full inline-flex justify-center rounded-xl px-4 py-2 bg-rose-600 text-base font-bold text-white shadow-sm hover:bg-rose-700 sm:w-auto sm:text-sm transition">
+                            Ya, Hapus
+                        </button>
+                    </form>
+                    <button type="button" onclick="closeDeleteModal()" class="w-full inline-flex justify-center rounded-xl border border-gray-300 px-4 py-2 bg-white text-base font-bold text-gray-700 shadow-sm hover:bg-gray-50 sm:w-auto sm:text-sm transition">
+                        Batal
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 
-@endsection
+    {{-- ================================================= --}}
+    {{-- MODAL EDIT TANGGAL MERAH (AJAX FETCH) --}}
+    {{-- ================================================= --}}
+    <div id="editHolidayModal" class="fixed inset-0 z-[9999] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-md w-full border border-gray-100">
 
-@push('scripts')
-{{-- ============================================= --}}
-{{-- --- JAVASCRIPT BARU: Untuk Modal Edit --- --}}
-{{-- ============================================= --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi modal Bootstrap
-        var editModalElement = document.getElementById('editHolidayModal');
-        var editModal = new bootstrap.Modal(editModalElement);
-        
-        var editForm = document.getElementById('editHolidayForm');
-        var editDateInput = document.getElementById('edit_holiday_date');
-        var editDescInput = document.getElementById('edit_description');
+                <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <h3 class="text-lg font-extrabold text-gray-900">Edit Tanggal Merah</h3>
+                    <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
 
-        // Tambahkan event listener ke SEMUA tombol edit
-        document.querySelectorAll('.btn-edit').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var holidayId = this.getAttribute('data-id');
-                
-                // 1. Atur 'action' untuk form di dalam modal
-                // Ini akan mengarahkan form ke route update yang benar, misal: /admin/superadmin/holidays/5
-                var updateUrl = "{{ url('admin/superadmin/holidays') }}/" + holidayId;
-                editForm.setAttribute('action', updateUrl);
-                
-                // 2. Buat URL untuk mengambil data (route 'edit')
-                var editUrl = "{{ url('admin/superadmin/holidays') }}/" + holidayId + "/edit";
-                
-                // 3. Ambil data dari server menggunakan fetch()
-                fetch(editUrl)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Gagal mengambil data');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // 4. Isi form di dalam modal dengan data yang didapat
-                        editDateInput.value = data.holiday_date;
-                        editDescInput.value = data.description;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Tidak dapat memuat data. Silakan coba lagi.');
-                        // Sembunyikan modal jika gagal
-                        editModal.hide();
-                    });
-            });
-        });
+                <form id="editHolidayForm" method="POST">
+                    @csrf
+                    @method('PUT')
 
-        // Opsional: Bersihkan form saat modal ditutup
-        editModalElement.addEventListener('hidden.bs.modal', function () {
+                    <div class="px-6 py-6">
+                        <div class="mb-5">
+                            <label for="edit_holiday_date" class="block text-sm font-bold text-gray-700 mb-2">Tanggal Libur <span class="text-rose-500">*</span></label>
+                            <input type="date" id="edit_holiday_date" name="edit_holiday_date" required
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white text-gray-700 font-medium">
+                        </div>
+                        <div class="mb-2">
+                            <label for="edit_description" class="block text-sm font-bold text-gray-700 mb-2">Keterangan <span class="text-rose-500">*</span></label>
+                            <input type="text" id="edit_description" name="edit_description" required
+                                   placeholder="Contoh: Hari Raya Idul Fitri"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-slate-50 focus:ring-4 outline-none transition bg-gray-50 focus:bg-white">
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-3">
+                        <button type="submit" id="btnUpdate" class="w-full inline-flex justify-center rounded-xl px-4 py-2 bg-slate-900 text-base font-bold text-white shadow-sm hover:bg-slate-800 sm:w-auto sm:text-sm transition">
+                            Simpan Perubahan
+                        </button>
+                        <button type="button" onclick="closeEditModal()" class="w-full inline-flex justify-center rounded-xl border border-gray-300 px-4 py-2 bg-white text-base font-bold text-gray-700 shadow-sm hover:bg-gray-50 sm:w-auto sm:text-sm transition">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Script JavaScript Murni (Vanilla JS) --}}
+    <script>
+        // DOM Elements Delete Modal
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteForm = document.getElementById('deleteForm');
+        const holidayDescEl = document.getElementById('holidayDesc');
+
+        // DOM Elements Edit Modal
+        const editModal = document.getElementById('editHolidayModal');
+        const editForm = document.getElementById('editHolidayForm');
+        const editDateInput = document.getElementById('edit_holiday_date');
+        const editDescInput = document.getElementById('edit_description');
+        const btnUpdate = document.getElementById('btnUpdate');
+
+        // Functions Delete Modal
+        function openDeleteModal(url, desc) {
+            deleteForm.action = url;
+            holidayDescEl.textContent = desc;
+            deleteModal.classList.remove('hidden');
+        }
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+        }
+
+        // Functions Edit Modal
+        function openEditModal(holidayId) {
+            // Ubah tombol jadi loading state
+            btnUpdate.innerHTML = 'Memuat...';
+            btnUpdate.disabled = true;
+
+            // Set Form Action URL
+            editForm.action = "{{ url('admin/superadmin/holidays') }}/" + holidayId;
+
+            // Buka Modal
+            editModal.classList.remove('hidden');
+
+            // Fetch Data dari Server
+            fetch("{{ url('admin/superadmin/holidays') }}/" + holidayId + "/edit")
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal mengambil data');
+                    return response.json();
+                })
+                .then(data => {
+                    // Isi form dengan data yang didapat
+                    editDateInput.value = data.holiday_date;
+                    editDescInput.value = data.description;
+
+                    // Kembalikan tombol
+                    btnUpdate.innerHTML = 'Simpan Perubahan';
+                    btnUpdate.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Tidak dapat memuat data. Silakan coba lagi.');
+                    closeEditModal();
+                });
+        }
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
             editForm.reset();
-            editForm.setAttribute('action', ''); // Hapus action URL lama
-        });
+            editForm.action = '';
+        }
 
-        // Cek jika ada error validasi edit (dari $errors->any())
-        // Jika ada, kita buka modal secara otomatis untuk menunjukkan error
-        @if ($errors->has('edit_holiday_date') || $errors->has('edit_description'))
-            // Dapatkan URL 'action' terakhir (jika tersimpan di old input, atau perlu cara lain)
-            // Cara termudah adalah membuka modal jika ada error,
-            // tapi mengisi data lamanya mungkin perlu penyesuaian
-            // Untuk saat ini, kita biarkan user membuka manual lagi
-            // alert('Terdapat error pada editan terakhir. Silakan cek pesan error di atas.');
-            
-            // Cara lebih canggih: Buka modal terakhir yang diedit
-            // Ini sulit dilakukan tanpa tahu ID terakhir yang diedit
-            // Jadi, kita biarkan validasi di atas halaman saja.
-        @endif
-
-    });
-</script>
+        // Tutup modal jika klik background gelap
+        window.onclick = function(event) {
+            if (event.target.classList.contains('bg-slate-900/60')) {
+                closeDeleteModal();
+                closeEditModal();
+            }
+        }
+    </script>
+@endsection
