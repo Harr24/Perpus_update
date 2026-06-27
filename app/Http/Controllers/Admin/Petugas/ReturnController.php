@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\BookCopy; 
+use App\Models\BookCopy;
 
 class ReturnController extends Controller
 {
@@ -38,7 +38,7 @@ class ReturnController extends Controller
         $activeBorrowings = $query->orderBy('user_id', 'asc')
                                  ->latest('approved_at')
                                  ->get();
-        
+
         // Ambil data hari libur untuk pewarnaan di view (opsional tapi berguna)
         $holidays = DB::table('holidays')
                     ->pluck('holiday_date')
@@ -47,8 +47,8 @@ class ReturnController extends Controller
         return view('admin.petugas.returns.index', [
             'activeBorrowings' => $activeBorrowings,
             'search' => $search,
-            'holidays' => $holidays, 
-            'today' => Carbon::today() 
+            'holidays' => $holidays,
+            'today' => Carbon::today()
         ]);
     }
 
@@ -68,19 +68,19 @@ class ReturnController extends Controller
 
         $borrowing->loadMissing('user');
 
-        DB::transaction(function () use ($borrowing, $holidayDates) { 
+        DB::transaction(function () use ($borrowing, $holidayDates) {
             $returnDate = Carbon::now();
             $book = $borrowing->bookCopy->book;
-            $dueDate = $borrowing->due_date ? Carbon::parse($borrowing->due_date) : null; 
-            
+            $dueDate = $borrowing->due_date ? Carbon::parse($borrowing->due_date) : null;
+
             $lateDays = 0;
-            $fine = 0; 
+            $fine = 0;
 
             // Logika Denda: User ada, bukan Guru, bukan buku Laporan, dan Lewat Jatuh Tempo
             if (
-                $borrowing->user && $borrowing->user->role !== 'guru' && 
-                $book->book_type != 'laporan' && 
-                $dueDate && 
+                $borrowing->user && $borrowing->user->role !== 'guru' &&
+                $book->book_type != 'laporan' &&
+                $dueDate &&
                 $returnDate->isAfter($dueDate)
             ) {
                 // Hitung hari terlambat (skip weekend & holidays)
@@ -98,7 +98,7 @@ class ReturnController extends Controller
             $borrowing->fine_amount = $fine;
             $borrowing->late_days = $lateDays;
             $borrowing->returned_by = Auth::id();
-            $borrowing->fine_status = ($fine > 0) ? 'unpaid' : 'paid'; 
+            $borrowing->fine_status = ($fine > 0) ? 'unpaid' : 'paid';
             $borrowing->save();
 
             // Update status fisik buku menjadi tersedia
@@ -106,7 +106,7 @@ class ReturnController extends Controller
             $bookCopy->status = 'tersedia';
             $bookCopy->save();
         });
-        
+
         $message = 'Buku berhasil dikembalikan.';
         if ($borrowing->fine_amount > 0) {
             $message .= ' Denda keterlambatan sebesar Rp ' . number_format($borrowing->fine_amount, 0, ',', '.') . ' tercatat.';
@@ -126,7 +126,7 @@ class ReturnController extends Controller
         ]);
 
         $borrowingIds = $request->input('borrowing_ids');
-        
+
         $borrowingsToReturn = Borrowing::with('user')
                                 ->whereIn('id', $borrowingIds)
                                 ->whereIn('status', ['dipinjam', 'overdue'])
@@ -149,15 +149,15 @@ class ReturnController extends Controller
             foreach ($borrowingsToReturn as $borrowing) {
                 $returnDate = Carbon::now();
                 $book = $borrowing->bookCopy->book;
-                $dueDate = $borrowing->due_date ? Carbon::parse($borrowing->due_date) : null; 
-                
+                $dueDate = $borrowing->due_date ? Carbon::parse($borrowing->due_date) : null;
+
                 $lateDays = 0;
-                $fine = 0; 
+                $fine = 0;
 
                 if (
-                    $borrowing->user && $borrowing->user->role !== 'guru' && 
-                    $book->book_type != 'laporan' && 
-                    $dueDate && 
+                    $borrowing->user && $borrowing->user->role !== 'guru' &&
+                    $book->book_type != 'laporan' &&
+                    $dueDate &&
                     $returnDate->isAfter($dueDate)
                 ) {
                     $lateDays = $dueDate->diffInDaysFiltered(function (Carbon $date) use ($holidayDates) {
@@ -165,10 +165,10 @@ class ReturnController extends Controller
                         $isHoliday = in_array($date->format('Y-m-d'), $holidayDates);
                         return !$isWeekend && !$isHoliday;
                     }, $returnDate);
-                    
+
                     $fine = $lateDays * 1000;
                 }
-                
+
                 $totalFine += $fine;
                 $borrowing->status = 'returned';
                 $borrowing->returned_at = $returnDate;
@@ -181,7 +181,7 @@ class ReturnController extends Controller
                 $bookCopy = $borrowing->bookCopy;
                 $bookCopy->status = 'tersedia';
                 $bookCopy->save();
-                
+
                 $totalReturned++;
             }
         });
@@ -204,15 +204,15 @@ class ReturnController extends Controller
         }
 
         // Asumsi: Denda hilang dihandle manual / 0 di sistem otomatis
-        $lostFineAmount = 0; 
+        $lostFineAmount = 0;
 
         DB::transaction(function () use ($borrowing, $lostFineAmount) {
             $processDate = Carbon::now();
-            
+
             // 1. Update Status Fisik Buku -> 'hilang'
             $bookCopy = $borrowing->bookCopy;
             if ($bookCopy) {
-                $bookCopy->status = 'hilang'; 
+                $bookCopy->status = 'hilang';
                 $bookCopy->save();
             } else {
                  throw new \Exception("Data eksemplar buku tidak ditemukan untuk peminjaman ID: {$borrowing->id}");
@@ -220,19 +220,19 @@ class ReturnController extends Controller
 
             // 2. Update Status Transaksi -> 'missing' (BUKAN 'returned')
             // Ini kuncinya agar di laporan bisa dibedakan.
-            $borrowing->status = 'missing'; 
-            
-            $borrowing->returned_at = $processDate; 
-            $borrowing->late_days = 0; 
-            $borrowing->fine_amount = $lostFineAmount; 
+            $borrowing->status = 'missing';
+
+            $borrowing->returned_at = $processDate;
+            $borrowing->late_days = 0;
+            $borrowing->fine_amount = $lostFineAmount;
             $borrowing->fine_status = 'paid'; // Atau sesuaikan jika ada denda ganti rugi
-            $borrowing->returned_by = Auth::id(); 
+            $borrowing->returned_by = Auth::id();
             $borrowing->save();
         });
-        
+
         $bookTitle = $borrowing->bookCopy && $borrowing->bookCopy->book ? $borrowing->bookCopy->book->title : '[Judul Tidak Ditemukan]';
         $bookCode = $borrowing->bookCopy ? $borrowing->bookCopy->book_code : '[Kode Tidak Ditemukan]';
-        
+
         $message = "Buku '{$bookTitle}' (Eksemplar: {$bookCode}) berhasil ditandai sebagai HILANG.";
         return redirect()->back()->with('success', $message);
     }

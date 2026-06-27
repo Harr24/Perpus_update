@@ -32,14 +32,14 @@ class BorrowingController extends Controller
         }
 
         // ==========================================================
-        // --- TAMBAHAN: Validasi Batas Maksimal 3 Buku (Siswa) ---
+        // Validasi Batas Maksimal 3 Buku (Siswa) ---
         // ==========================================================
         if ($user->role == 'siswa') {
             // Hitung semua buku yang statusnya 'aktif' (sedang dipinjam atau menunggu persetujuan)
             $activeLoanCount = Borrowing::where('user_id', $user->id)
                 ->whereIn('status', ['pending', 'dipinjam', 'overdue'])
                 ->count();
-            
+
             if ($activeLoanCount >= 3) {
                 return redirect()->route('catalog.show', $book_copy->book_id)
                          ->with('error', 'Gagal! Siswa hanya boleh meminjam maksimal 3 buku sekaligus (termasuk yang menunggu konfirmasi).');
@@ -59,13 +59,13 @@ class BorrowingController extends Controller
                 ->whereHas('bookCopy.book', function ($query) {
                     $query->where('book_type', 'paket');
                 })->exists();
-            
+
             if ($hasActiveTextbookLoan) {
                 return redirect()->route('catalog.show', $book_copy->book_id)->with('error', 'Anda tidak bisa meminjam lebih dari 1 buku paket.');
             }
         }
         // ==========================================================
-        
+
         $borrowDate = Carbon::now();
         $dueDate = null; // Default null
 
@@ -75,7 +75,7 @@ class BorrowingController extends Controller
         if ($book_copy->book->book_type !== 'laporan') {
             $dueDate = Carbon::now();
             $daysAdded = 0;
-            while ($daysAdded < 7) { 
+            while ($daysAdded < 7) {
                 $dueDate->addDay();
                 if (!$dueDate->isSaturday() && !$dueDate->isSunday()) {
                     $daysAdded++;
@@ -92,14 +92,14 @@ class BorrowingController extends Controller
         $user = Auth::user();
 
         // ==========================================================
-        // --- TAMBAHAN: Validasi Batas Maksimal 3 Buku (Siswa) ---
+        // Validasi Batas Maksimal 3 Buku (Siswa) ---
         // ==========================================================
         // Ini adalah validasi utama di sisi server
         if ($user->role == 'siswa') {
             $activeLoanCount = Borrowing::where('user_id', $user->id)
                 ->whereIn('status', ['pending', 'dipinjam', 'overdue'])
                 ->count();
-            
+
             if ($activeLoanCount >= 3) {
                 return redirect()->back()
                          ->with('error', 'Gagal! Anda sudah mencapai batas maksimal 3 peminjaman buku (termasuk yang menunggu konfirmasi).');
@@ -118,8 +118,8 @@ class BorrowingController extends Controller
                 ->whereHas('bookCopy.book', function ($query) {
                     $query->where('book_type', 'laporan');
                 })
-                ->whereIn('status', ['pending', 'borrowed']) 
-                ->exists(); 
+                ->whereIn('status', ['pending', 'borrowed'])
+                ->exists();
 
             if ($activeReportLoan) {
                 return redirect()->back()->with('error', 'Anda hanya dapat meminjam 1 Buku Laporan pada satu waktu.');
@@ -129,13 +129,13 @@ class BorrowingController extends Controller
 
 
         // ==========================================================
-        // --- PERBAIKAN: Menggunakan 'paket' ---
+        // ---  Menggunakan 'paket' ---
         // ==========================================================
         $isBookPackage = ($book_copy->book->book_type == 'paket');
 
         if ($user->role == 'siswa' && $isBookPackage) {
             $hasActiveTextbookLoan = Borrowing::where('user_id', $user->id)
-                ->whereIn('status', ['pending', 'borrowed']) 
+                ->whereIn('status', ['pending', 'borrowed'])
                 ->whereHas('bookCopy.book', function ($query) {
                     $query->where('book_type', 'paket');
                 })->exists();
@@ -149,7 +149,7 @@ class BorrowingController extends Controller
         if ($user->account_status !== 'active' || $book_copy->status !== 'tersedia') {
             return redirect()->route('catalog.index')->with('error', 'Gagal mengajukan pinjaman. Akun atau buku tidak valid.');
         }
-        
+
         $book_copy->status = 'pending';
         $book_copy->save();
 
@@ -157,11 +157,11 @@ class BorrowingController extends Controller
         // --- PERBAIKAN: Logika Batas Waktu (Dibuat Konsisten) ---
         // ==========================================================
         $dueDate = null; // Default null untuk 'laporan'
-        
+
         if ($book_copy->book->book_type !== 'laporan') {
             $dueDate = Carbon::now();
             $daysAdded = 0;
-            while ($daysAdded < 7) { 
+            while ($daysAdded < 7) {
                 $dueDate->addDay();
                 if (!$dueDate->isSaturday() && !$dueDate->isSunday()) {
                     $daysAdded++;
@@ -184,10 +184,10 @@ class BorrowingController extends Controller
     public function storeBulk(Request $request)
     {
         $request->validate([
-            'book_id' => 'required|exists:books,id', 
+            'book_id' => 'required|exists:books,id',
             'quantity' => 'required|integer|min:1'
         ]);
-        
+
         $user = Auth::user();
         $book = Book::find($request->book_id);
         $quantity = $request->quantity;
@@ -205,7 +205,7 @@ class BorrowingController extends Controller
         }
         // ==========================================================
 
-        
+
         // ==========================================================
         // --- PERBAIKAN: Menggunakan 'paket' ---
         // ==========================================================
@@ -216,7 +216,7 @@ class BorrowingController extends Controller
             return redirect()->back()->with('error', 'Aksi tidak diizinkan. Pinjaman massal hanya untuk Guru dan Tipe Buku Paket.');
         }
         // ==========================================================
-        
+
         // CATATAN: Kita tidak menambahkan validasi "Max 3" di sini,
         // karena method ini khusus untuk GURU, bukan SISWA.
 
@@ -235,12 +235,12 @@ class BorrowingController extends Controller
                 // ==========================================================
                 // --- PERBAIKAN: Logika Batas Waktu ---
                 // ==========================================================
-                $dueDate = null; 
+                $dueDate = null;
 
                 if ($book->book_type !== 'laporan') {
                     $dueDate = Carbon::now();
                     $daysAdded = 0;
-                    while ($daysAdded < 7) { 
+                    while ($daysAdded < 7) {
                         $dueDate->addDay();
                         if (!$dueDate->isSaturday() && !$dueDate->isSunday()) {
                             $daysAdded++;
@@ -252,12 +252,12 @@ class BorrowingController extends Controller
                 foreach ($availableCopies as $copy) {
                     $copy->status = 'pending';
                     $copy->save();
-                    
+
                     Borrowing::create([
-                        'user_id' => $user->id, 
-                        'book_copy_id' => $copy->id, 
-                        'borrowed_at' => Carbon::now(), 
-                        'due_at' => $dueDate, 
+                        'user_id' => $user->id,
+                        'book_copy_id' => $copy->id,
+                        'borrowed_at' => Carbon::now(),
+                        'due_at' => $dueDate,
                         'status' => 'pending'
                     ]);
                 }

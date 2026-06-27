@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin\Petugas;
 
 use App\Http\Controllers\Controller;
 use App\Models\Borrowing;
-use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\DB; // Pastikan DB di-import
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class LoanApprovalController extends Controller
@@ -18,14 +18,14 @@ class LoanApprovalController extends Controller
     {
         $currentDate = $startDate->copy();
         $daysAdded = 0;
-        
+
         while ($daysAdded < $daysToAdd) {
             $currentDate->addDay(); // Maju satu hari
-            
+
             // Cek apakah hari ini valid (bukan weekend, bukan libur)
             $isWeekend = $currentDate->isSaturday() || $currentDate->isSunday();
             $isHoliday = in_array($currentDate->format('Y-m-d'), $holidays);
-            
+
             // Jika BUKAN akhir pekan DAN BUKAN tanggal merah, baru kita hitung
             if (!$isWeekend && !$isHoliday) {
                 $daysAdded++;
@@ -34,9 +34,9 @@ class LoanApprovalController extends Controller
         return $currentDate;
     }
 
-    public function index(Request $request) 
+    public function index(Request $request)
     {
-        $search = $request->input('search'); 
+        $search = $request->input('search');
 
         $query = Borrowing::where('status', 'pending')
                             ->with('user', 'bookCopy.book');
@@ -47,9 +47,9 @@ class LoanApprovalController extends Controller
                 $q->where('name', 'like', '%' . $search . '%');
             });
         }
-        
+
         $pendingBorrowings = $query->latest()->get();
-        return view('admin.petugas.approvals.index', compact('pendingBorrowings', 'search')); 
+        return view('admin.petugas.approvals.index', compact('pendingBorrowings', 'search'));
     }
 
     public function approve(Borrowing $borrowing)
@@ -72,7 +72,7 @@ class LoanApprovalController extends Controller
             $approvalDate = Carbon::now();
 
             $book = $borrowing->bookCopy->book;
-            
+
             // ==========================================================
             // --- PERBAIKAN: Logika Batas Waktu Baru ---
             // ==========================================================
@@ -90,7 +90,7 @@ class LoanApprovalController extends Controller
             $borrowing->approved_at = $approvalDate;
             $borrowing->approved_by = auth()->id();
             $borrowing->due_date = $dueDate; // Terapkan $dueDate baru
-            
+
             $bookCopy = $borrowing->bookCopy;
             $bookCopy->status = 'dipinjam';
 
@@ -120,7 +120,7 @@ class LoanApprovalController extends Controller
 
         return redirect()->back()->with('success', 'Pengajuan pinjaman berhasil ditolak.');
     }
-    
+
     public function approveMultiple(Request $request)
     {
         $request->validate([
@@ -165,7 +165,7 @@ class LoanApprovalController extends Controller
                 $borrowing->status = 'dipinjam';
                 $borrowing->approved_at = $approvalDate;
                 $borrowing->approved_by = auth()->id();
-                $borrowing->due_date = $dueDate; 
+                $borrowing->due_date = $dueDate;
                 $borrowing->save();
 
                 $bookCopy = $borrowing->bookCopy;

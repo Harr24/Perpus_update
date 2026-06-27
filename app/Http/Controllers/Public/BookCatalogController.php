@@ -14,7 +14,7 @@ use App\Models\LibrarySchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon; 
+use Carbon\Carbon;
 
 class BookCatalogController extends Controller
 {
@@ -22,7 +22,7 @@ class BookCatalogController extends Controller
     {
         $heroSliders = HeroSlider::where('is_active', true)->latest()->get();
         $genres = Genre::take(6)->get();
-        
+
         $nonTextbookQuery = Book::where('book_type', 'reguler');
 
         // 1. Buku Favorit (Populer)
@@ -53,11 +53,10 @@ class BookCatalogController extends Controller
 
 
         // ==========================================================
-        // --- 🔥 FITUR BARU: Top Readers (Juara Membaca) 🔥 ---
+        // ---  Top Readers (Juara Membaca) ---
         // ==========================================================
         $now = now();
         $currentYear = $now->year;
-        
         // Tentukan Semester (Jan-Jun atau Jul-Des)
         if ($now->month >= 1 && $now->month <= 6) {
             $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
@@ -81,7 +80,7 @@ class BookCatalogController extends Controller
             ->get();
 
         // ==========================================================
-        // --- AKHIR FITUR BARU ---
+        // --- AKHIR ---
         // ==========================================================
 
 
@@ -98,9 +97,9 @@ class BookCatalogController extends Controller
             ->orderBy('day_of_week')
             ->get()
             ->groupBy('day_of_week');
-        
-        $todayDayOfWeek = now()->dayOfWeekIso; 
-        
+
+        $todayDayOfWeek = now()->dayOfWeekIso;
+
         $days = [
             1 => 'Senin',
             2 => 'Selasa',
@@ -111,10 +110,10 @@ class BookCatalogController extends Controller
 
         // Kirim semua variabel ke View
         return view('public.catalog.index', compact(
-            'heroSliders', 
-            'genres', 
-            'favoriteBooks', 
-            'latestBooks', 
+            'heroSliders',
+            'genres',
+            'favoriteBooks',
+            'latestBooks',
             'topBorrowers', // <-- Variabel Juara Membaca
             'learningMaterials',
             'semesterTitle',
@@ -153,7 +152,7 @@ class BookCatalogController extends Controller
         });
 
         if ($sort === 'popular') {
-            $booksQuery->orderByDesc('borrowings_count'); 
+            $booksQuery->orderByDesc('borrowings_count');
         } else {
             $booksQuery->latest();
         }
