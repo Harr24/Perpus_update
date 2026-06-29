@@ -9,21 +9,35 @@ class Borrowing extends Model
 {
     use HasFactory;
 
+    //protected $fillable = [
+        //'user_id',
+        //'book_copy_id',
+        //'borrowed_at',
+        //'due_at',
+        //'returned_at',
+        //'status',
+        //'due_date',
+        //'fine_amount',
+        //'fine_status',
+    //];
+
     protected $fillable = [
         'user_id',
         'book_copy_id',
         'borrowed_at',
         'due_at',
         'returned_at',
-        'status', 
-        'due_date', // Sebaiknya tambahkan juga due_date jika bisa diisi
-        'fine_amount', // dan field lain yang relevan
+        'status',
+        'due_date',
+        'fine_amount',
         'fine_status',
+        'approved_at', //
+        'approved_by', //
+        'returned_by', //
     ];
-    
+
     // ==========================================================
-    // TAMBAHAN: Properti $casts untuk mengubah string jadi Objek Tanggal
-    // Ini akan memperbaiki error "Call to a member function format() on string"
+    // $casts untuk mengubah string jadi Objek Tanggal
     // ==========================================================
     /**
      * The attributes that should be cast.
