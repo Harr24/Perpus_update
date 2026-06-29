@@ -175,6 +175,7 @@ class BorrowingController extends Controller
             'book_copy_id' => $book_copy->id,
             'borrowed_at' => Carbon::now(),
             'due_at' => $dueDate, // Terapkan due_date baru (bisa null)
+            'due_date' => $dueDate ? $dueDate->format('Y-m-d') : null, //tanda
             'status' => 'pending',
         ]);
 
@@ -207,7 +208,7 @@ class BorrowingController extends Controller
 
 
         // ==========================================================
-        // --- PERBAIKAN: Menggunakan 'paket' ---
+        // --- Menggunakan 'paket' ---
         // ==========================================================
         $isBookPackage = ($book->book_type == 'paket');
 
@@ -258,6 +259,7 @@ class BorrowingController extends Controller
                         'book_copy_id' => $copy->id,
                         'borrowed_at' => Carbon::now(),
                         'due_at' => $dueDate,
+                        'due_date' => $dueDate ? $dueDate->format('Y-m-d') : null, // tanda
                         'status' => 'pending'
                     ]);
                 }

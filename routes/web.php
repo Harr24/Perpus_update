@@ -54,8 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
-    // --- 🔥 RUTE BARU: HAPUS FOTO PROFIL 🔥 ---
+
+    // ---  RUTE BARU: HAPUS FOTO PROFIL ---
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
     // ==========================================================
 
@@ -65,12 +65,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/borrow/{book_copy}', [BorrowingController::class, 'store'])->name('borrow.store');
     Route::get('/my-borrowings', [BorrowingController::class, 'index'])->name('borrow.history');
 
-    // RUTE KHUSUS UNTUK ROLE PETUGAS
+    // RUTE ROLE PETUGAS
     Route::middleware('role:petugas')->prefix('admin/petugas')->name('admin.petugas.')->group(function () {
         Route::get('/verifikasi-siswa', [VerificationController::class, 'index'])->name('verification.index');
         Route::post('/verifikasi-siswa/{user}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
         Route::post('/verifikasi-siswa/{user}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
         Route::get('/verifikasi-siswa/lihat-kartu/{user}', [VerificationController::class, 'showStudentCard'])->name('verification.showCard');
+
+       // RUTE SIRKULASI MEJA (PEMINJAMAN LANGSUNG OLEH PETUGAS)
+        Route::get('/direct-borrow', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'create'])->name('direct_borrow.create');
+        Route::get('/direct-borrow/{user}/books', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'selectBooks'])->name('direct_borrow.select_books');
+        Route::post('/direct-borrow/{user}', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'store'])->name('direct_borrow.store');
 
         Route::resource('genres', GenreController::class)->except(['show']);
 
@@ -113,24 +118,24 @@ Route::middleware('auth')->group(function () {
     // RUTE KHUSUS UNTUK ROLE SUPERADMIN
     Route::middleware('role:superadmin')->prefix('admin/superadmin')->name('admin.superadmin.')->group(function () {
         Route::resource('petugas', SuperadminPetugasController::class);
-        
+
         Route::delete('/members/graduated', [MemberController::class, 'destroyGraduated'])->name('members.destroy.graduated');
-        
+
         Route::resource('members', MemberController::class)->except(['create', 'store']);
-        
+
         Route::resource('sliders', HeroSliderController::class);
 
         Route::get('/fines/history', [SuperadminFineController::class, 'history'])->name('fines.history');
         Route::delete('/fines/history/{fine}', [SuperadminFineController::class, 'destroy'])->name('fines.destroy');
-        
+
         Route::get('/fines/history/export', [SuperadminFineController::class, 'export'])->name('fines.export');
-        
+
         Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
         Route::post('/holidays', [HolidayController::class, 'store'])->name('holidays.store');
-        
+
         Route::get('/holidays/{holiday}/edit', [HolidayController::class, 'edit'])->name('holidays.edit');
         Route::put('/holidays/{holiday}', [HolidayController::class, 'update'])->name('holidays.update');
-        
+
         Route::delete('/holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
 
         Route::get('schedules', [ScheduleController::class, 'index'])->name('schedules.index');
@@ -142,5 +147,5 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('shelves', ShelfController::class)->except(['show']);
     });
-    
+
 });

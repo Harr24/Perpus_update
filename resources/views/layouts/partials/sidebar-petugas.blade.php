@@ -27,6 +27,12 @@
         <a href="{{ route('admin.petugas.approvals.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.petugas.approvals.*') ? 'bg-emerald-50 text-emerald-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-emerald-700' }} transition">
             <span class="text-lg">📝</span> Pengajuan Pinjam
         </a>
+
+        {{-- 🔥 MENU BARU: Peminjaman Ekspres / Kasir 🔥 --}}
+        <a href="{{ route('admin.petugas.direct_borrow.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.petugas.direct_borrow.*') ? 'bg-emerald-50 text-emerald-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-emerald-700' }} transition">
+            <span class="text-lg">⚡</span> Peminjaman Ekspres
+        </a>
+
         <a href="{{ route('admin.petugas.returns.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.petugas.returns.*') ? 'bg-emerald-50 text-emerald-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-emerald-700' }} transition">
             <span class="text-lg">📥</span> Pengembalian Buku
         </a>
