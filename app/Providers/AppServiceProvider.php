@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator; // <-- Ini kode Paginator Anda
+use Illuminate\Pagination\Paginator; // <-- Ini kode Paginator
 
 // ===========================================
-// --- Import Model & Observer Anda ---
+// --- Import Model & Observer ---
 // ===========================================
 use App\Models\Borrowing;
 use App\Observers\BorrowingObserver;
@@ -26,10 +26,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Kode Paginator Anda
+        // Kode Paginator
         Paginator::useBootstrapFive();
-        
-        // Kode Observer Anda
+
+        // Kode Observer
         Borrowing::observe(BorrowingObserver::class);
     }
 }
