@@ -6,7 +6,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Peminjaman</h2>
-                <p class="text-gray-500 mt-1 font-medium">Daftar buku yang sedang dipinjam & terlambat.</p>
+                <p class="text-gray-500 mt-1 font-medium">Daftar buku yang sedang dipinjam & filter keterlambatan.</p>
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('admin.petugas.fines.index') }}" class="inline-flex items-center px-4 py-2 bg-amber-100 border border-amber-200 rounded-xl font-bold text-sm text-amber-700 hover:bg-amber-200 transition shadow-sm">
@@ -45,8 +45,8 @@
 
     <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
         {{-- Card Header / Toolbar --}}
-        <div class="p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-4 bg-gray-50/50">
-            <div class="flex items-center">
+        <div class="p-6 border-b border-gray-100 flex flex-col xl:flex-row justify-between items-center gap-4 bg-gray-50/50">
+            <div class="flex items-center shrink-0 w-full xl:w-auto justify-start">
                 <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mr-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 </div>
@@ -55,17 +55,43 @@
                 </h3>
             </div>
 
-            <div class="flex flex-col sm:flex-row w-full lg:w-auto gap-3">
-                {{-- Form Pencarian --}}
-                <form action="{{ route('admin.petugas.returns.index') }}" method="GET" class="flex w-full sm:w-auto relative">
-                    <input type="search" name="search" class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition" placeholder="Cari peminjam / buku..." value="{{ $search ?? '' }}">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    @if(isset($search) && $search)
-                        <a href="{{ route('admin.petugas.returns.index') }}" class="absolute right-3 top-2.5 text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></a>
+            <div class="flex flex-col md:flex-row w-full xl:w-auto gap-3 items-center justify-end">
+
+                {{-- Form Pencarian & Filter Canggih --}}
+                <form action="{{ route('admin.petugas.returns.index') }}" method="GET" class="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+
+                    {{-- Filter Tipe Buku --}}
+                    <select name="filter_type" class="border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-2 bg-white text-gray-700 shadow-sm cursor-pointer" onchange="this.form.submit()">
+                        <option value="">Semua Tipe</option>
+                        <option value="reguler" {{ request('filter_type') == 'reguler' ? 'selected' : '' }}>Reguler</option>
+                        <option value="paket" {{ request('filter_type') == 'paket' ? 'selected' : '' }}>Buku Paket</option>
+                        <option value="laporan" {{ request('filter_type') == 'laporan' ? 'selected' : '' }}>Laporan PKL</option>
+                    </select>
+
+                    {{-- Filter Status Keterlambatan --}}
+                    <select name="filter_status" class="border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm px-3 py-2 bg-white text-gray-700 shadow-sm cursor-pointer" onchange="this.form.submit()">
+                        <option value="">⏱️ Semua Status</option>
+                        <option value="aman" {{ request('filter_status') == 'aman' ? 'selected' : '' }}>✅ Aman / Tepat Waktu</option>
+                        <option value="terlambat" {{ request('filter_status') == 'terlambat' ? 'selected' : '' }}>🚨 Terlambat</option>
+                    </select>
+
+                    {{-- Input Pencarian Text --}}
+                    <div class="relative flex-1 sm:w-56">
+                        <input type="search" name="search" class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition shadow-sm" placeholder="Cari peminjam / buku..." value="{{ request('search') }}">
+                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+
+                    {{-- Tombol Cari & Reset --}}
+                    <button type="submit" class="hidden">Cari</button>
+                    @if(request('search') || request('filter_type') || request('filter_status'))
+                        <a href="{{ route('admin.petugas.returns.index') }}" class="inline-flex items-center justify-center px-3 py-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition text-sm font-bold border border-rose-100 shadow-sm shrink-0" title="Hapus Semua Filter">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </a>
                     @endif
                 </form>
 
-                <button type="submit" form="bulk-return-form" class="inline-flex items-center px-4 py-2 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" id="btn-return-multiple" disabled>
+                {{-- Tombol Aksi Massal --}}
+                <button type="submit" form="bulk-return-form" class="inline-flex items-center justify-center px-4 py-2 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shrink-0 w-full sm:w-auto" id="btn-return-multiple" disabled>
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Kembalikan Dipilih
                 </button>
             </div>
