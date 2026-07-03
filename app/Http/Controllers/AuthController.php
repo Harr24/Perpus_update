@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use App\Models\Major; 
+use App\Models\Major;
 
 class AuthController extends Controller
 {
@@ -27,7 +27,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            
+
             // ==========================================================
             // --- UPDATE VALIDASI NISN (Hanya Angka) ---
             // ==========================================================
@@ -38,8 +38,8 @@ class AuthController extends Controller
 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
 
-            'class' => ['required', 'in:X,XI,XII'], 
-            'major' => ['required', 'string', 'max:255', 'exists:majors,name'], 
+            'class' => ['required', 'in:X,XI,XII'],
+            'major' => ['required', 'string', 'max:255', 'exists:majors,name'],
 
             // ==========================================================
             // --- UPDATE VALIDASI WHATSAPP (Hanya Angka) ---
@@ -94,7 +94,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Memproses data dari form login.
+     * Login Malas.
      */
     public function login(Request $request)
     {
