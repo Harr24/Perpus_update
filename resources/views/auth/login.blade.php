@@ -87,7 +87,7 @@
         </div>
 
         {{-- =============================================== --}}
-        {{-- TAMBAHAN: Tombol Kembali ke Homepage           --}}
+        {{-- Tombol Kembali ke Homepage           --}}
         {{-- =============================================== --}}
         <div class="login-footer" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
             <a href="{{ route('catalog.index') }}">Kembali ke Homepage</a>

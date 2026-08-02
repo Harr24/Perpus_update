@@ -26,7 +26,7 @@ class Book extends Model
         'author',
         'synopsis',
         'genre_id',
-        'shelf_id', // <-- TAMBAHAN (1 dari 2): Tambahkan shelf_id ke fillable
+        'shelf_id', // rak
         'cover_image',
         'stock',
         'book_type',
