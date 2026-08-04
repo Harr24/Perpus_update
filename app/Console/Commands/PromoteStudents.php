@@ -25,7 +25,7 @@ class PromoteStudents extends Command
     {
         $this->info('Memulai proses kenaikan kelas untuk siswa...');
 
-        // Kita gunakan Transaction agar jika ada error di tengah jalan, 
+        // Kita gunakan Transaction agar jika ada error di tengah jalan,
         // database tidak berantakan (semua batal atau semua sukses).
         DB::beginTransaction();
 
@@ -33,7 +33,7 @@ class PromoteStudents extends Command
             // ---------------------------------------------------------
             // 1. PROSES KELAS XII -> LULUS (Prioritas Pertama)
             // ---------------------------------------------------------
-            // Kita proses yang kelas XII dulu supaya tidak tertimpa oleh yang baru naik dari XI
+            // Proses yang kelas XII dulu supaya tidak tertimpa oleh yang baru naik dari XI
             $lulusCount = User::where('role', 'siswa')
                 ->where(function($q) {
                     $q->where('class', 'XII')
@@ -43,7 +43,7 @@ class PromoteStudents extends Command
                     'class' => 'Lulus',
                     'class_name' => 'LULUS', // Agar tampil "LULUS" di View
                     'major' => null,         // Kosongkan jurusan karena sudah lulus
-                    // 'account_status' => 'graduated' // Uncomment jika Anda sudah punya status 'graduated'
+                    // 'account_status' => 'graduated' // Uncomment jika punya status 'graduated'
                 ]);
 
             $this->info(" -> $lulusCount siswa kelas XII berhasil diluluskan.");
@@ -57,7 +57,7 @@ class PromoteStudents extends Command
                 ->update([
                     'class' => 'XII'
                 ]);
-            
+
             $this->info(" -> $naikKe12Count siswa kelas XI naik ke kelas XII.");
 
             // ---------------------------------------------------------
@@ -74,7 +74,7 @@ class PromoteStudents extends Command
 
             // Jika semua lancar, simpan perubahan
             DB::commit();
-            
+
             $total = $lulusCount + $naikKe12Count + $naikKe11Count;
             $this->info("\nSUKSES! Total $total siswa telah diperbarui.");
 
@@ -88,3 +88,5 @@ class PromoteStudents extends Command
         return 0; // Kode sukses
     }
 }
+// Naik kelas bisa cmd bila perlu
+// php artisan app:promote-students 

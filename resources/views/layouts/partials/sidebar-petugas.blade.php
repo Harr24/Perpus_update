@@ -7,7 +7,7 @@
         </h1>
     </div>
 
-    {{-- Menu Navigasi (SCROLLABLE) --}}
+    {{-- Menu Navigasi --}}
     <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto custom-scrollbar min-h-0">
         <span class="block px-4 pb-2 text-[11px] font-bold text-gray-400 tracking-wider uppercase mt-2">Menu Utama</span>
 
@@ -31,7 +31,7 @@
             Pengajuan Pinjam
         </a>
 
-        {{-- 🔥 MENU BARU: Peminjaman Ekspres / Kasir 🔥 --}}
+        {{-- MENU BARU: Peminjaman Ekspres / Kasir --}}
         <a href="{{ route('admin.petugas.direct_borrow.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.petugas.direct_borrow.*') ? 'bg-emerald-50 text-emerald-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-emerald-700' }} transition">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd" /></svg>
             Peminjaman Ekspres

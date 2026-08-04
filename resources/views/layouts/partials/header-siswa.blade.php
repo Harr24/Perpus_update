@@ -8,6 +8,11 @@
     </div>
 
     <div class="flex items-center gap-4">
+    @unless(request()->routeIs('dashboard'))
+        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+                <span>⬅️</span> Kembali
+    @endunless
+        </a>
         <div class="flex items-center gap-3 pl-2 pr-1 py-1 bg-white/60 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition cursor-pointer" onclick="window.location.href='{{ route('profile.edit') }}'">
             <div class="text-right pl-3 hidden sm:block">
                 <p class="text-sm font-bold text-gray-800">{{ strtok(auth()->user()->name, " ") }} <span class="ml-1 text-gray-400">⌄</span></p>

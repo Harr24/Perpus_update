@@ -49,7 +49,22 @@ class LoanApprovalController extends Controller
         }
 
         $pendingBorrowings = $query->latest()->get();
-        return view('admin.petugas.approvals.index', compact('pendingBorrowings', 'search'));
+
+        // ==========================================================
+        // --- MENGHITUNG ESTIMASI TENGGAT UNTUK DITAMPILKAN ---
+        // ==========================================================
+        // 1. Ambil data hari libur dari database
+        $holidayDates = \Illuminate\Support\Facades\DB::table('holidays')
+                            ->pluck('holiday_date')
+                            ->map(fn($dateStr) => (new \Carbon\Carbon($dateStr))->format('Y-m-d'))
+                            ->toArray();
+
+        // 2. Hitung estimasi tenggat jika petugas meng-ACC HARI INI (7 Hari Kerja)
+        $estimatedDueDate = $this->addWorkingDays(\Carbon\Carbon::now(), 7, $holidayDates);
+        // ==========================================================
+
+        // Pastikan $estimatedDueDate dimasukkan ke dalam compact() di bawah ini:
+        return view('admin.petugas.approvals.index', compact('pendingBorrowings', 'search', 'estimatedDueDate'));
     }
 
     public function approve(Borrowing $borrowing)

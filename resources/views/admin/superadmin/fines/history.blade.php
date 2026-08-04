@@ -61,16 +61,21 @@
                             <th class="px-6 py-5 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($paidFines as $fine)
                             @php $lastPayment = $fine->finePayments->last(); @endphp
                             <tr class="hover:bg-gray-50/80 transition duration-200">
-                                <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ $fine->user->name ?? '-' }}</td>
-                                <td class="px-6 py-4 text-sm font-medium text-gray-600">{{ $fine->user->class_info ?? '-' }}</td>
+                                {{-- Gunakan Nullsafe Operator (?->) agar tidak crash jika user dihapus --}}
+                                <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ $fine->user?->name ?? 'Anggota Dihapus' }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-600">{{ $fine->user?->class_info ?? '-' }}</td>
+
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-bold text-gray-900">{{ $fine->bookCopy->book->title ?? 'Buku Dihapus' }}</div>
-                                    <div class="text-[10px] font-mono text-gray-400 uppercase">{{ $fine->bookCopy->book_code ?? '-' }}</div>
+                                    {{-- Gunakan Nullsafe Operator (?->) agar tidak crash jika buku/eksemplar dihapus --}}
+                                    <div class="text-sm font-bold text-gray-900">{{ $fine->bookCopy?->book?->title ?? 'Buku Dihapus/Hilang' }}</div>
+                                    <div class="text-[10px] font-mono text-gray-400 uppercase">{{ $fine->bookCopy?->book_code ?? '-' }}</div>
                                 </td>
+
                                 <td class="px-6 py-4 text-sm font-extrabold text-rose-600 text-right">Rp{{ number_format($fine->fine_amount, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-sm font-medium text-gray-600">
                                     {{ $lastPayment ? $lastPayment->created_at->format('d M Y') : 'N/A' }}

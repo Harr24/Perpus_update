@@ -80,6 +80,7 @@
                         <th class="p-4">Judul Buku</th>
                         <th class="p-4">Kode Buku</th>
                         <th class="p-4">Tanggal Pengajuan</th>
+                        <th class="p-4">Estimasi Tenggat</th>
                         <th class="p-4 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -89,6 +90,10 @@
                         @php
                             $isNewUser = $borrow->user_id !== $currentUserId;
                             $currentUserId = $borrow->user_id;
+
+                            // Deteksi buku laporan dan guru agar tampilannya "Tidak Ada Batas"
+                            $bookType = $borrow->bookCopy->book->book_type ?? 'reguler';
+                            $userRole = $borrow->user->role ?? 'siswa';
                         @endphp
 
                     <tr class="hover:bg-gray-50/80 transition" data-user-id="{{ $borrow->user_id }}">
@@ -126,6 +131,15 @@
                             {{ $borrow->created_at->format('d M Y, H:i') }}
                         </td>
                         <td class="p-4">
+                            @if($bookType === 'laporan' || $userRole === 'guru')
+                                <span class="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-md text-xs font-bold border border-gray-200 whitespace-nowrap">Tidak Ada Batas</span>
+                            @else
+                                <span class="text-emerald-600 font-bold text-sm whitespace-nowrap" title="Jika disetujui hari ini">
+                                    {{ $estimatedDueDate->format('d M Y') }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="p-4">
                             <div class="flex justify-end gap-2">
                                 <form action="{{ route('admin.petugas.approvals.approve', $borrow) }}" method="POST">
                                     @csrf
@@ -144,7 +158,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="p-10 text-center text-gray-400">
+                        <td colspan="8" class="p-10 text-center text-gray-400">
                             <div class="flex flex-col items-center justify-center">
                                 <svg class="w-16 h-16 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                 <span class="text-base font-medium">Tidak ada pengajuan pinjaman baru.</span>

@@ -9,9 +9,6 @@
                 <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Profil Saya</h2>
                 <p class="text-gray-500 mt-1 font-medium">Kelola informasi data diri dan keamanan akun Anda.</p>
             </div>
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
-                <span>⬅️</span> Kembali
-            </a>
         </div>
 
         {{-- Alert Success --}}
