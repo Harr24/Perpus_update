@@ -30,7 +30,7 @@ class AuthController extends Controller
         // Anti Spam
         // ==========================================================
         $todayRegistrations = User::whereDate('created_at', Carbon::today())
-                                  ->where('role', 'siswa',)
+                                  ->where('role', 'siswa') // Hapus koma berlebih di sini
                                   ->count();
 
         if ($todayRegistrations >= 20) {
@@ -101,7 +101,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Menampilkan halaman form login.
+     * Menampilkan halaman form login UMUM (Siswa, Guru, Petugas).
      */
     public function showLoginForm()
     {
@@ -109,7 +109,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Login Malas.
+     * Memproses Login UMUM.
      */
     public function login(Request $request)
     {
@@ -119,6 +119,17 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+
+            // ==========================================================
+            // BLOKIR SUPERADMIN DI JALUR UMUM
+            // ==========================================================
+            if (Auth::user()->role === 'superadmin') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->with('error', 'Akses ditolak. Superadmin tidak diizinkan masuk melalui jalur publik.');
+            }
+            // ==========================================================
 
             if (Auth::user()->account_status !== 'active') {
                 Auth::logout();
@@ -136,13 +147,60 @@ class AuthController extends Controller
     }
 
     /**
+     * Menampilkan form login rahasia Superadmin
+     */
+    public function showSuperadminLogin()
+    {
+        return view('auth.login-superadmin');
+    }
+
+    /**
+     * Memproses Login rahasia Superadmin
+     */
+    public function superadminLoginProcess(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+
+            // CEK KEAMANAN: Pastikan yang masuk benar-benar Superadmin
+            if (Auth::user()->role !== 'superadmin') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->with('error', 'Akses Ilegal! Portal ini khusus tingkat Superadmin.');
+            }
+
+            // Jika lulus, arahkan ke dashboard
+            $request->session()->regenerate();
+            return redirect()->intended('dashboard');
+        }
+
+        return back()->with('error', 'Login gagal! Autentikasi tidak valid.');
+    }
+    // =========================================================================
+
+    /**
+     * Memproses logout user.
+     */
+
+/**
      * Memproses logout user.
      */
     public function logout(Request $request)
     {
+        $role = Auth::user() ? Auth::user()->role : null;
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        if ($role === 'superadmin') {
+            return redirect()->route('superadmin.login'); // Lempar ke /portal-kendali-mcp
+        }
+
+        return redirect('/login'); // Selain superadmin, lempar ke halaman login biasa
     }
 }

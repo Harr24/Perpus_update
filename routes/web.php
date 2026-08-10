@@ -25,7 +25,6 @@ use App\Http\Controllers\Admin\Superadmin\ShelfController;
 use App\Http\Controllers\Admin\Superadmin\HolidayController;
 use App\Http\Controllers\Admin\Superadmin\ScheduleController;
 
-
 // RUTE PUBLIK & TAMU
 Route::get('/', [BookCatalogController::class, 'index'])->name('catalog.index');
 Route::get('/catalog/all', [BookCatalogController::class, 'allBooks'])->name('catalog.all');
@@ -38,8 +37,17 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [AuthController::class, 'register']);
     Route::get('register/success', [AuthController::class, 'registrationSuccess'])->name('register.success');
+
+    // Login Siswa/Guru/Petugas (Umum)
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login']);
+
+    // ==========================================================
+    // RUTE KHUSUS SUPERADMIN
+    // =========================================================
+    Route::get('/portal-kendali-mcp', [AuthController::class, 'showSuperadminLogin'])->name('superadmin.login');
+    Route::post('/portal-kendali-mcp', [AuthController::class, 'superadminLoginProcess'])->name('superadmin.login.process');
+    // ==========================================================
 });
 
 // RUTE UNTUK PENGGUNA YANG SUDAH LOGIN
@@ -69,9 +77,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/verifikasi-siswa', [VerificationController::class, 'index'])->name('verification.index');
         Route::post('/verifikasi-siswa/{user}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
         Route::post('/verifikasi-siswa/{user}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
-        Route::get('/verifikasi-siswa/lihat-kartu/{user}', [VerificationController::class, 'showStudentCard'])->name('verification.showCard');
 
-       // RUTE SIRKULASI MEJA (PEMINJAMAN LANGSUNG OLEH PETUGAS)
+        // Kodingan di bawah ini dimatikan karena method di controller sudah dihapus (diganti Storage::url di blade)
+        // Route::get('/verifikasi-siswa/lihat-kartu/{user}', [VerificationController::class, 'showStudentCard'])->name('verification.showCard');
+
+        // RUTE SIRKULASI MEJA (PEMINJAMAN LANGSUNG OLEH PETUGAS)
         Route::get('/direct-borrow', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'create'])->name('direct_borrow.create');
         Route::get('/direct-borrow/{user}/books', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'selectBooks'])->name('direct_borrow.select_books');
         Route::post('/direct-borrow/{user}', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'store'])->name('direct_borrow.store');
@@ -148,6 +158,5 @@ Route::middleware('auth')->group(function () {
         Route::resource('majors', MajorController::class)->except(['show']);
 
         Route::resource('shelves', ShelfController::class)->except(['show']);
-
     });
 });
