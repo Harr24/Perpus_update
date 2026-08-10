@@ -15,21 +15,17 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
 
         // ==========================================================
-        // --- TAMBAHKAN JADWALMU DI SINI ---
+        // --- TAMBAHKAN JADWAL DI SINI ---
         // ==========================================================
-        
+
         // Jalankan command 'app:promote-students'
         // ->yearlyOn(7, 1, '01:00');
         // Artinya: Setiap tahun (yearly)
         //          pada bulan ke-7 (Juli),
         //          tanggal 1,
         //          jam 1:00 pagi (Waktu Server).
-        
+
         $schedule->command('app:promote-students')->yearlyOn(7, 1, '01:00');
-        
-        // ==========================================================
-        // --- BATAS TAMBAHAN ---
-        // ==========================================================
     }
 
     /**
