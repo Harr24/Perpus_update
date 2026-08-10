@@ -18,7 +18,7 @@ class VerificationController extends Controller
                             ->where('account_status', 'pending')
                             ->orderBy('created_at', 'asc')
                             ->get();
-        
+
         return view('admin.petugas.verification.index', compact('pendingUsers'));
     }
 
@@ -28,10 +28,18 @@ class VerificationController extends Controller
     public function approve(User $user)
     {
         if ($user->role === 'siswa' && $user->account_status === 'pending') {
+
+            // 1. Hapus file fisik foto dari folder penyimpanan server (Storage)
+            if (!empty($user->student_card_photo)) {
+                Storage::delete($user->student_card_photo);
+            }
+
+            // 2. Aktifkan akun dan kosongkan kolom foto di database
             $user->account_status = 'active';
+            $user->student_card_photo = null; // Dikosongkan agar memori database juga bersih
             $user->save();
 
-            return redirect()->back()->with('success', 'Akun siswa berhasil diaktifkan.');
+            return redirect()->back()->with('success', 'Akun siswa berhasil diaktifkan dan file foto telah dibersihkan dari memori.');
         }
 
         return redirect()->back()->with('error', 'Aksi tidak valid atau akun sudah diproses.');
@@ -43,19 +51,18 @@ class VerificationController extends Controller
     public function reject(User $user)
     {
         if ($user->role === 'siswa' && $user->account_status === 'pending') {
-            
+
+            // 1. Pastikan file fisik foto ikut terhapus sebelum akun dihapus
             if (!empty($user->student_card_photo)) {
-                // Gunakan Storage::delete() untuk konsistensi
                 Storage::delete($user->student_card_photo);
             }
 
+            // 2. Hapus total data pendaftar dari database
             $user->delete();
 
-            return redirect()->back()->with('success', 'Pendaftaran siswa berhasil ditolak.');
+            return redirect()->back()->with('success', 'Pendaftaran siswa berhasil ditolak dan seluruh datanya telah dihapus.');
         }
-        
+
         return redirect()->back()->with('error', 'Aksi tidak valid atau akun sudah diproses.');
     }
-
-    // Method showStudentCard telah dihapus dari sini.
 }

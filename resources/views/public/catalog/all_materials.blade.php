@@ -10,11 +10,9 @@
     <style>
         :root { --brand-red: #c62828; }
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        
+
         /* ==========================================================
-          --- REVISI: Menggunakan style 'material-card' Anda ---
-          Saya akan gunakan class 'material-card' yang sudah Anda buat
-          untuk kartu baru dengan thumbnail.
+          --- REVISI: Menggunakan style 'material-card' ---
           ==========================================================
         */
         .material-card {
@@ -24,13 +22,13 @@
             overflow: hidden;
             text-decoration: none;
             color: #212529;
-            background-color: #fff; 
+            background-color: #fff;
         }
         .material-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
-        
+
         /* Style untuk pagination agar sesuai tema */
         .pagination .page-item.active .page-link {
             background-color: var(--brand-red);
@@ -50,7 +48,7 @@
              background-color: #e9ecef;
              border-color: #dee2e6;
          }
-         
+
         /* Style untuk gambar thumbnail agar pas */
          .material-card-img {
             height: 200px;
@@ -120,31 +118,31 @@
             </form>
         </div>
 
-        
+
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @forelse($materials as $material)
                 <div class="col">
                     <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="material-card h-100 d-flex flex-column">
-                        
+
                         {{-- GAMBAR THUMBNAIL BARU --}}
                         <img src="{{ $material->thumbnail_url }}" class="card-img-top material-card-img" alt="Thumbnail {{ $material->title }}">
-                        
+
                         <div class="card-body d-flex flex-column p-4">
                             <h5 class="card-title fw-bold mb-2">{{ Str::limit($material->title, 50) }}</h5>
-                            
+
                             @if($material->description)
                                 <p class="card-text text-muted small mb-3">
                                     {{ Str::limit($material->description, 100) }}
                                 </p>
                             @endif
-                            
+
                             {{-- Footer Kartu (Info Guru & Tipe) --}}
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         Oleh: {{ $material->user->name }}
                                     </small>
-                                    
+
                                     {{-- Badge Tipe Konten --}}
                                     @if(str_contains($material->link_url, 'youtu'))
                                         <span class="badge bg-danger">

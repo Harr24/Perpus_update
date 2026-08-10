@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Models\Major;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -25,6 +26,21 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // ==========================================================
+        // Anti Spam
+        // ==========================================================
+        $todayRegistrations = User::whereDate('created_at', Carbon::today())
+                                  ->where('role', 'siswa',)
+                                  ->count();
+
+        if ($todayRegistrations >= 20) {
+            // Jika sudah 20 atau lebih, kembalikan user ke form dengan pesan error
+            return redirect()->back()
+                             ->withInput()
+                             ->withErrors(['error' => 'Mohon maaf, kuota pendaftaran hari ini sudah penuh (Maksimal 20 pendaftar/hari) untuk mencegah spam. Silakan coba lagi besok.']);
+        }
+        // ==========================================================
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
 
@@ -32,8 +48,8 @@ class AuthController extends Controller
             // --- UPDATE VALIDASI NISN (Hanya Angka) ---
             // ==========================================================
             // 'numeric': Wajib angka
-            // 'digits_between': Minimal 5 digit, Maksimal 20 digit (sesuaikan kebutuhan)
-            'nis' => ['required', 'numeric', 'digits_between:5,20', 'unique:users,nis'],
+            // 'digits_between': Minimal 5 digit, Maksimal 15 digit
+            'nis' => ['required', 'numeric', 'digits_between:5,15', 'unique:users,nis'],
             // ==========================================================
 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -57,7 +73,6 @@ class AuthController extends Controller
             'phone_number.numeric' => 'Nomor WhatsApp harus berupa angka.',
             'digits_between' => 'Panjang :attribute harus antara :min sampai :max digit.',
         ]);
-
 
         $path = $request->file('student_card_photo')->store('student-cards', 'public');
 

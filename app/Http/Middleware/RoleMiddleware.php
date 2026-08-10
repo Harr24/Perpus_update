@@ -14,6 +14,7 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    // role middleware backend cegat jika orang tau url role yg lain maka langsunc cek atribut role nya
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Cek apakah user sudah login

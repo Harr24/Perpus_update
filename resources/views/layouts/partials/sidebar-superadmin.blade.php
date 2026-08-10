@@ -1,11 +1,17 @@
 <aside class="w-full bg-white flex flex-col border-r border-gray-100 sticky top-0" style="height: 100vh; height: 100dvh;">
 
     {{-- HEADER SIDEBAR --}}
-    <div class="h-24 flex items-center px-8 shrink-0">
+
+    <div class="h-24 flex items-center px-8 shrink-0 border-b border-gray-50 bg-white z-10">
+        {{-- Tempat Logo Saja --}}
+        <img src="{{ asset('images/MCP.jpg') }}" alt="Logo Multicomp" class="h-12 w-auto object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300">
+    </div>
+
+    {{--<div class="h-24 flex items-center px-8 shrink-0">
         <h1 class="text-xl font-extrabold tracking-tight text-gray-900 uppercase">
             Multicomp.
         </h1>
-    </div>
+    </div>--}}
 
     {{-- MENU NAVIGASI (Dengan min-h-0 agar bisa di-scroll) --}}
     <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto custom-scrollbar min-h-0">
@@ -56,6 +62,13 @@
         <a href="{{ route('admin.superadmin.sliders.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('admin.superadmin.sliders.*') ? 'bg-rose-50 text-rose-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-rose-600' }}">
             <span class="text-lg">🖼️</span> Hero Sliders
         </a>
+
+        <a href="{{ route('admin.superadmin.backup.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.superadmin.backup.*') ? 'bg-emerald-50 text-emerald-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-xl transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Backup Database
+        </a>
+
+        <span class="block px-4 pt-6 pb-2 text-[11px] font-bold text-gray-400 tracking-wider uppercase">Keuangan</span>
 
         <span class="block px-4 pt-6 pb-2 text-[11px] font-bold text-gray-400 tracking-wider uppercase">Keuangan</span>
 

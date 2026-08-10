@@ -49,15 +49,14 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     // ==========================================================
-    // RUTE PROFIL (Updated)
+    // RUTE PROFIL
     // ==========================================================
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    // ---  RUTE BARU: HAPUS FOTO PROFIL ---
+    // ---HAPUS FOTO PROFIL ---
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
-    // ==========================================================
 
     // RUTE PEMINJAMAN
     Route::post('/borrow/bulk', [BorrowingController::class, 'storeBulk'])->name('borrow.store.bulk');
@@ -124,6 +123,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('members', MemberController::class)->except(['create', 'store']);
 
         Route::resource('sliders', HeroSliderController::class);
+        // Backup
+        Route::get('/backup', [\App\Http\Controllers\Admin\Superadmin\BackupController::class, 'index'])->name('backup.index');
+        Route::get('/backup/download', [\App\Http\Controllers\Admin\Superadmin\BackupController::class, 'downloadSql'])->name('backup.download');
 
         Route::get('/fines/history', [SuperadminFineController::class, 'history'])->name('fines.history');
         Route::delete('/fines/history/{fine}', [SuperadminFineController::class, 'destroy'])->name('fines.destroy');
@@ -146,6 +148,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('majors', MajorController::class)->except(['show']);
 
         Route::resource('shelves', ShelfController::class)->except(['show']);
-    });
 
+    });
 });

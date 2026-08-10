@@ -250,7 +250,7 @@
                     </div>
                 </div>
             </div>
-            {{--LOGIKA TAMPILKAN ICON GENRE--}}
+            {{--ICON GENRE--}}
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3" data-aos="fade-up" data-aos-delay="200">
                 @forelse ($genres as $genre)
                     <div class="col">
@@ -271,7 +271,7 @@
                     <div class="col-12 text-center"><p class="text-muted">Genre belum ditambahkan.</p></div>
                 @endforelse
             </div>
-            {{-- ========================================================== --}}
+            {{-- ==================================================== --}}
 
         </div>
 

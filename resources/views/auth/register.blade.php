@@ -43,7 +43,7 @@
             max-width: 800px;
             width: 100%;
         }
-        
+
         /* Header */
         .header {
             text-align: center;
@@ -89,7 +89,7 @@
             grid-template-columns: 1fr; /* 1 kolom di HP */
             gap: 20px;
         }
-        
+
         @media (min-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr 1fr; /* 2 kolom di Desktop */
@@ -101,7 +101,7 @@
             flex-direction: column;
             gap: 6px;
         }
-        
+
         .input-group.full-width {
             grid-column: 1 / -1; /* Span 2 kolom */
         }
@@ -117,7 +117,7 @@
         .input-group input[type="email"],
         .input-group input[type="tel"],
         .input-group input[type="password"],
-        .input-group select { 
+        .input-group select {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid var(--border);
@@ -125,10 +125,10 @@
             font-family: 'Poppins', sans-serif;
             font-size: 0.95rem;
             transition: all 0.2s ease;
-            -webkit-appearance: none; 
+            -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-color: var(--card); 
+            background-color: var(--card);
         }
 
         /* Khusus Select dropdown icon */
@@ -138,27 +138,27 @@
             background-position: right 14px center;
             background-size: 1.25em;
         }
-        
+
         /* Hapus spinner input number di Chrome/Safari/Edge */
-        .input-group input[type="number"]::-webkit-inner-spin-button, 
-        .input-group input[type="number"]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        .input-group input[type="number"]::-webkit-inner-spin-button,
+        .input-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
-        
+
         .input-group input::placeholder {
             color: #9ca3af;
         }
 
         .input-group input:focus,
-        .input-group select:focus { 
+        .input-group select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.1);
         }
 
         .input-group input.is-invalid,
-        .input-group select.is-invalid { 
+        .input-group select.is-invalid {
             border-color: var(--error);
         }
 
@@ -244,9 +244,9 @@
     </style>
 </head>
 <body>
-    
+
     <div class="container">
-        
+
         <div class="header">
             <div class="logo" aria-hidden="true">📚</div>
             <h2>Daftar Anggota Baru</h2>
@@ -266,7 +266,7 @@
 
         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
             @csrf
-            
+
             <div class="form-grid">
 
                 <div class="input-group">
@@ -276,22 +276,22 @@
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
                 </div>
-                
+
                 {{-- ========================================================== --}}
-                {{-- --- PERUBAHAN 1: INPUT NISN (ANGKA SAJA) --- --}}
+                {{-- 1: INPUT NISN --}}
                 {{-- ========================================================== --}}
                 <div class="input-group">
                     <label for="nis">NISN</label>
-                    <input id="nis" 
-                           type="number" 
-                           name="nis" 
-                           value="{{ old('nis') }}" 
-                           required 
-                           placeholder="Masukkan NISN Anda" 
+                    <input id="nis"
+                           type="text"
+                           inputmode="numeric"
+                           name="nis"
+                           value="{{ old('nis') }}"
+                           required
+                           placeholder="Masukkan NISN Anda (Maks. 15 Angka)"
                            class="@error('nis') is-invalid @enderror"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"> 
-                           {{-- Script di atas memblokir input selain angka 0-9 --}}
-                    
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);">
+
                     @error('nis')
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
@@ -305,7 +305,7 @@
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
                 </div>
-                
+
                 <div class="input-group">
                     <label for="class">Kelas</label>
                     <select id="class" name="class" class="@error('class') is-invalid @enderror" required>
@@ -337,27 +337,28 @@
                 </div>
 
                 {{-- ========================================================== --}}
-                {{-- --- PERUBAHAN 2: INPUT WA (ANGKA SAJA) --- --}}
+                {{-- --- INPUT WA --- --}}
                 {{-- ========================================================== --}}
                 <div class="input-group full-width">
                     <label for="phone_number">Nomor WhatsApp (Aktif)</label>
-                    <input id="phone_number" 
-                           type="tel" 
-                           name="phone_number" 
-                           value="{{ old('phone_number') }}" 
-                           required 
-                           placeholder="Contoh: 081234567890" 
+                    <input id="phone_number"
+                           type="text"
+                           inputmode="numeric"
+                           name="phone_number"
+                           value="{{ old('phone_number') }}"
+                           required
+                           placeholder="Contoh: 081234567890"
                            class="@error('phone_number') is-invalid @enderror"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"> 
-                           {{-- Script blokir huruf --}}
-                    
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);">
+                           {{-- Script blokir huruf DAN batasi 15 angka --}}
+
                     @error('phone_number')
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
                 </div>
                 {{-- ========================================================== --}}
 
-                
+
                 <div class="input-group full-width">
                     <label for="student_card_photo">Foto Kartu Pelajar (Untuk Verifikasi)</label>
                     <label class="file-upload-label" for="student_card_photo" id="file-label">
@@ -385,7 +386,7 @@
                     <label for="password_confirmation">Konfirmasi Password</label>
                     <input id="password_confirmation" type="password" name="password_confirmation" required placeholder="Ulangi password">
                 </div>
-                
+
                 <div class="input-group full-width">
                     <button type="submit" class="submit-btn">Daftar Sekarang</button>
                 </div>
