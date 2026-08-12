@@ -30,9 +30,7 @@ class PromoteStudents extends Command
         DB::beginTransaction();
 
         try {
-            // ---------------------------------------------------------
             // 1. PROSES KELAS XII -> LULUS (Prioritas Pertama)
-            // ---------------------------------------------------------
             // Proses yang kelas XII dulu supaya tidak tertimpa oleh yang baru naik dari XI
             $lulusCount = User::where('role', 'siswa')
                 ->where(function($q) {
@@ -47,10 +45,7 @@ class PromoteStudents extends Command
                 ]);
 
             $this->info(" -> $lulusCount siswa kelas XII berhasil diluluskan.");
-
-            // ---------------------------------------------------------
             // 2. PROSES KELAS XI -> XII
-            // ---------------------------------------------------------
             // Siswa kelas XI naik ke XII. Jurusan (major) TETAP, tidak diubah.
             $naikKe12Count = User::where('role', 'siswa')
                 ->where('class', 'XI')
@@ -60,9 +55,8 @@ class PromoteStudents extends Command
 
             $this->info(" -> $naikKe12Count siswa kelas XI naik ke kelas XII.");
 
-            // ---------------------------------------------------------
-            // 3. PROSES KELAS X -> XI
-            // ---------------------------------------------------------
+            // PROSES KELAS X -> XI
+
             // Siswa kelas X naik ke XI. Jurusan (major) TETAP, tidak diubah.
             $naikKe11Count = User::where('role', 'siswa')
                 ->where('class', 'X')
@@ -89,4 +83,4 @@ class PromoteStudents extends Command
     }
 }
 // Naik kelas bisa cmd bila perlu
-// php artisan app:promote-students 
+// php artisan app:promote-students

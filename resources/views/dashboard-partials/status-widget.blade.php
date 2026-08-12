@@ -1,4 +1,4 @@
-{{-- 
+{{--
     Widget ini akan menerima variabel:
     $borrowingInfo (berisi data pinjaman, bisa grouped atau individual)
     $displayMode ('grouped', 'individual', atau null)
@@ -8,10 +8,8 @@
 {{-- Cek dulu apakah ada info pinjaman ($borrowingInfo tidak null) --}}
 @if(isset($borrowingInfo) && $borrowingInfo !== null)
 
-    {{-- ========================================================== --}}
     {{-- TAMPILAN UNTUK GURU (GROUPED) --}}
-    {{-- ========================================================== --}}
-    @if($displayMode == 'grouped') 
+    @if($displayMode == 'grouped')
         <h3 class="widget-title" id="widgetTitle">
             📚 Buku Paket yang Sedang Dipinjam
         </h3>
@@ -27,17 +25,17 @@
                             <span>Tidak ada cover</span>
                         </div>
                     @endif
-                    
+
                     <div class="borrowed-info">
                         {{-- Tampilkan Judul Buku --}}
                         <h4>{{ $group->book->title ?? 'Judul Tidak Ditemukan' }}</h4>
-                        
+
                         {{-- Tampilkan Jumlah Eksemplar --}}
                         <div class="borrowed-meta">
                             <span>Jumlah:</span>
                             <strong>{{ $group->count }} eksemplar</strong>
                         </div>
-                        
+
                         {{-- Tampilkan Rentang Tanggal (Opsional, tapi informatif) --}}
                         {{-- Pastikan earliest_borrowed dan latest_due adalah objek Carbon --}}
                         @if($group->earliest_borrowed instanceof \Carbon\Carbon)
@@ -64,16 +62,14 @@
         {{-- Tombol untuk melihat detail/riwayat --}}
         <a href="{{ route('borrow.history') }}" class="btn-widget-full">Lihat Rincian & Riwayat Peminjaman</a>
 
-    {{-- ========================================================== --}}
-    {{-- TAMPILAN UNTUK SISWA (INDIVIDUAL) - Kode Lama Kamu --}}
-    {{-- ========================================================== --}}
-    @elseif($displayMode == 'individual') 
+    {{-- TAMPILAN UNTUK SISWA (INDIVIDUAL)--}}
+    @elseif($displayMode == 'individual')
          <h3 class="widget-title" id="widgetTitle">
             📖 Buku yang Sedang Dipinjam ({{ $borrowingInfo->count() }})
         </h3>
          <div class="borrowing-list-stack">
             {{-- Loop data individual (variabel $borrowingInfo berisi koleksi asli) --}}
-            @foreach($borrowingInfo as $activeBorrowing) 
+            @foreach($borrowingInfo as $activeBorrowing)
                 <div class="active-borrowing-card">
                     @if($activeBorrowing->bookCopy && $activeBorrowing->bookCopy->book && $activeBorrowing->bookCopy->book->cover_image)
                         <img src="{{ Storage::url($activeBorrowing->bookCopy->book->cover_image) }}" alt="Cover {{ $activeBorrowing->bookCopy->book->title }}" class="borrowed-cover">
@@ -110,10 +106,8 @@
          <a href="{{ route('borrow.history') }}" class="btn-widget-full">Lihat Semua Riwayat Peminjaman</a>
     @endif
 
-{{-- ========================================================== --}}
 {{-- TAMPILAN JIKA TIDAK ADA PINJAMAN AKTIF --}}
-{{-- ========================================================== --}}
-@else 
+@else
     <h3 class="widget-title" id="widgetTitle">💡 Kutipan Hari Ini</h3>
     <blockquote class="quote-card">
         <p>"{{ $quote['content'] ?? 'Membaca adalah jendela dunia.' }}"</p>

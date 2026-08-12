@@ -13,10 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-
-        // ==========================================================
         // --- TAMBAHKAN JADWAL DI SINI ---
-        // ==========================================================
 
         // Jalankan command 'app:promote-students'
         // ->yearlyOn(7, 1, '01:00');

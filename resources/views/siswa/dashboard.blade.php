@@ -6,9 +6,7 @@
         <p class="text-gray-500 mt-1 font-medium">Selamat datang di perpustakaan digital. Mau baca buku apa hari ini?</p>
     </div>
 
-    {{-- ========================================================== --}}
     {{-- BARIS 1: BUKU FAVORIT (KIRI) & WIDGET PINJAMAN (KANAN) --}}
-    {{-- ========================================================== --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
         {{-- KIRI: WIDGET 10 BUKU FAVORIT --}}
@@ -129,9 +127,7 @@
         </div>
     </div>
 
-    {{-- ========================================================== --}}
     {{-- BARIS 2: BANNER MULAI EKSPLORASI (CLEAN & MINIMALIST) --}}
-    {{-- ========================================================== --}}
     <div class="bg-white rounded-[1.5rem] shadow-sm p-6 sm:p-8 mb-6 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
         {{-- Garis Aksen Tipis di Kiri --}}
         <div class="absolute left-0 top-0 bottom-0 w-2 bg-indigo-600"></div>
@@ -150,9 +146,7 @@
         </div>
     </div>
 
-    {{-- ========================================================== --}}
     {{-- BARIS 3: INFORMASI PENTING --}}
-    {{-- ========================================================== --}}
     <div class="bg-white rounded-[1.5rem] shadow-sm p-6 sm:p-8 border border-gray-100">
         <div class="flex items-center gap-3 mb-6">
             <span class="text-2xl">📢</span>

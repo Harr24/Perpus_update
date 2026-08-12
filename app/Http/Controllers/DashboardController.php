@@ -28,12 +28,10 @@ class DashboardController extends Controller
         // Siapkan data spesifik berdasarkan role pengguna
         switch ($user->role) {
 
-            // ===================================================================================
-            // 🔥 BLOK LOGIN BARU KHUSUS SUPERADMIN (Fitur 1, 3, dan 5) 🔥
-            // ===================================================================================
+            // BLOK LOGIN SUPERADMIN (Fitur 1, 3, dan 5)
             case 'superadmin':
-                // 1. DATA STATISTIK UTAS (Sama dengan screenshot sebelumnya)
-                // Kita gunakan nama variabel yang umum agar bisa dipakai di view superadmin
+                // 1. DATA STATISTIK UTAS
+                // variabel view superadmin
                 $data['totalBuku'] = Book::count();
                 $data['anggotaAktif'] = User::whereIn('role', ['siswa', 'guru'])
                                             ->where('account_status', 'active')
@@ -45,7 +43,7 @@ class DashboardController extends Controller
                                             ->count();
 
                 // ----------------------------------------------------------
-                // 🔥 Fitur 3: GRAFIK PERTUMBUHAN ANGGOTA (Line Chart) 🔥
+                // 3 GRAFIK PERTUMBUHAN ANGGOTA (Line Chart)
                 // ----------------------------------------------------------
                 $currentYear = Carbon::now()->year;
 
@@ -68,10 +66,7 @@ class DashboardController extends Controller
                 $data['growthData'] = $growthData;
                 $data['currentYear'] = $currentYear;
 
-
-                // ----------------------------------------------------------
-                // 🔥 Fitur 1: GRAFIK EFEKTIVITAS SMART DUE DATE (Doughnut) 🔥
-                // ----------------------------------------------------------
+                // Fitur 1: GRAFIK EFEKTIVITAS SMART DUE DATE (Doughnut)
                 // Menghitung rasio tepat waktu vs terlambat dari semua transaksi
 
                 // A. Tepat Waktu: Sudah kembali && tanggal kembali <= tenggat
@@ -94,11 +89,8 @@ class DashboardController extends Controller
                 // Data untuk Chart.js [Tepat Waktu, Terlambat]
                 $data['smartDueDateData'] = [$onTime, $totalLate];
 
-
-                // ----------------------------------------------------------
-                // 🔥 Fitur 5: WIDGET LOG AUDIT SISTEM (Simulasi) 🔥
-                // ----------------------------------------------------------
-                // Karena belum ada tabel AuditLog, kita simulasikan dengan mengambil
+                // Fitur 5: WIDGET LOG AUDIT SISTEM (Simulasi)
+                // Karena belum ada tabel AuditLog,simulasikan dengan mengambil
                 // aktivitas master data terbaru: Anggota Baru & Buku Baru.
 
                 // Ambil 3 pendaftaran anggota terbaru
@@ -127,14 +119,9 @@ class DashboardController extends Controller
                                                  ->take(5);
                 break;
 
-
-            // ===================================================================================
-            // 🔥 BLOK LOGIKA ASLI UNTUK PETUGAS (Dipertahankan dari kode kamu) 🔥
-            // ===================================================================================
+            // BLOK LOGIKA ASLI UNTUK PETUGAS
             case 'petugas':
-                // ==========================================================
                 // 1. DATA STATISTIK ATAS
-                // ==========================================================
                 $data['pendingStudentsCount'] = User::where('role', 'siswa')
                                                     ->where('account_status', 'pending')
                                                     ->count();
@@ -148,9 +135,7 @@ class DashboardController extends Controller
                                             ->where('due_at', '<', now())
                                             ->count();
 
-                // ==========================================================
                 // 2. DATA GRAFIK GARIS (PEMINJAMAN BULAN INI)
-                // ==========================================================
                 $currentMonth = Carbon::now()->month;
                 $currentYear = Carbon::now()->year;
                 $daysInMonth = Carbon::now()->daysInMonth;
@@ -174,9 +159,7 @@ class DashboardController extends Controller
                 $data['chartData'] = $chartData;
                 $data['currentMonthName'] = Carbon::now()->translatedFormat('F Y');
 
-                // ==========================================================
-                // 🔥 3. DATA GRAFIK DONAT (GENRE BUKU TERLARIS) 🔥
-                // ==========================================================
+                // 3. DATA GRAFIK DONAT (GENRE BUKU TERLARIS)
                 $topGenres = DB::table('genres')
                     ->join('books', 'genres.id', '=', 'books.genre_id')
                     ->join('book_copies', 'books.id', '=', 'book_copies.book_id')
@@ -192,9 +175,7 @@ class DashboardController extends Controller
                 $data['genreLabels'] = $topGenres->pluck('name')->toArray();
                 $data['genreData'] = $topGenres->pluck('total')->toArray();
 
-                // ==========================================================
-                // 🔥 4. MONITOR GAMIFIKASI (3 BESAR PEMBACA) 🔥
-                // ==========================================================
+                //  4. MONITOR GAMIFIKASI (3 BESAR PEMBACA)
                 $data['topReaders'] = User::where('role', 'siswa')
                     ->where('account_status', 'active')
                     ->withCount(['borrowings' => function($q) {
@@ -204,9 +185,8 @@ class DashboardController extends Controller
                     ->take(3)
                     ->get();
 
-                // ==========================================================
-                // 🔥 5. WIDGET NOTIFIKASI (5 AKTIVITAS TERBARU) 🔥
-                // ==========================================================
+                // 5. WIDGET NOTIFIKASI (5 AKTIVITAS TERBARU)
+
                 $data['recentActivities'] = Borrowing::with(['user', 'bookCopy.book'])
                     ->latest('created_at')
                     ->take(5)
@@ -215,9 +195,8 @@ class DashboardController extends Controller
 
             case 'siswa':
             case 'guru':
-                // ==========================================================
-                // DATA DASHBOARD SISWA (Sudah ada & Aman, dipertahankan)
-                // ==========================================================
+
+                // DATA DASHBOARD SISWA
                 $data['favoriteBooks'] = Book::with('genre')
                     ->where('book_type', 'reguler')
                     ->withCount([

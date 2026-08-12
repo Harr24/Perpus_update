@@ -26,11 +26,9 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // ==========================================================
         // Anti Spam
-        // ==========================================================
         $todayRegistrations = User::whereDate('created_at', Carbon::today())
-                                  ->where('role', 'siswa') // Hapus koma berlebih di sini
+                                  ->where('role', 'siswa') //Siswa doang yg spam
                                   ->count();
 
         if ($todayRegistrations >= 20) {
@@ -39,31 +37,24 @@ class AuthController extends Controller
                              ->withInput()
                              ->withErrors(['error' => 'Mohon maaf, kuota pendaftaran hari ini sudah penuh (Maksimal 20 pendaftar/hari) untuk mencegah spam. Silakan coba lagi besok.']);
         }
-        // ==========================================================
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
 
-            // ==========================================================
-            // --- UPDATE VALIDASI NISN (Hanya Angka) ---
-            // ==========================================================
+            //  VALIDASI NISN (Hanya Angka)
             // 'numeric': Wajib angka
             // 'digits_between': Minimal 5 digit, Maksimal 15 digit
             'nis' => ['required', 'numeric', 'digits_between:5,15', 'unique:users,nis'],
-            // ==========================================================
 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
 
             'class' => ['required', 'in:X,XI,XII'],
             'major' => ['required', 'string', 'max:255', 'exists:majors,name'],
 
-            // ==========================================================
-            // --- UPDATE VALIDASI WHATSAPP (Hanya Angka) ---
-            // ==========================================================
+            // Wa Angka
             // 'numeric': Wajib angka
             // 'digits_between': Minimal 10 digit (standar nomor HP), Maksimal 15
             'phone_number' => ['required', 'numeric', 'digits_between:10,15', 'unique:users,phone_number'],
-            // ==========================================================
 
             'student_card_photo' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
             'password' => ['required', 'confirmed', Password::defaults()],
@@ -120,16 +111,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
 
-            // ==========================================================
             // BLOKIR SUPERADMIN DI JALUR UMUM
-            // ==========================================================
             if (Auth::user()->role === 'superadmin') {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 return back()->with('error', 'Akses ditolak. Superadmin tidak diizinkan masuk melalui jalur publik.');
             }
-            // ==========================================================
 
             if (Auth::user()->account_status !== 'active') {
                 Auth::logout();
@@ -166,7 +154,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
 
-            // CEK KEAMANAN: Pastikan yang masuk benar-benar Superadmin
+            // keamananan yang masuk cuma superadmin
             if (Auth::user()->role !== 'superadmin') {
                 Auth::logout();
                 $request->session()->invalidate();
@@ -182,7 +170,6 @@ class AuthController extends Controller
 
         return back()->with('error', 'Login gagal! Autentikasi tidak valid.');
     }
-    // =========================================================================
 
     /**
      * Memproses logout user.

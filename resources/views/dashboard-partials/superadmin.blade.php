@@ -1,6 +1,4 @@
-{{-- ========================================================== --}}
 {{-- MANAJEMEN PENGGUNA --}}
-{{-- ========================================================== --}}
 <a class="nav-item" href="{{ route('admin.superadmin.petugas.index') }}">
 <div class="nav-item-main"><span>Kelola Akun Petugas</span></div>
 <span class="meta">Manajemen Staf</span>

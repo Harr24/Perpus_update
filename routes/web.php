@@ -42,12 +42,9 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login']);
 
-    // ==========================================================
-    // RUTE KHUSUS SUPERADMIN
-    // =========================================================
+    // RUTE SUPERADMIN
     Route::get('/portal-kendali-mcp', [AuthController::class, 'showSuperadminLogin'])->name('superadmin.login');
     Route::post('/portal-kendali-mcp', [AuthController::class, 'superadminLoginProcess'])->name('superadmin.login.process');
-    // ==========================================================
 });
 
 // RUTE UNTUK PENGGUNA YANG SUDAH LOGIN
@@ -56,14 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // ==========================================================
     // RUTE PROFIL
-    // ==========================================================
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    // ---HAPUS FOTO PROFIL ---
+    // HAPUS FOTO PROFIL
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
     // RUTE PEMINJAMAN
@@ -129,6 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('petugas', SuperadminPetugasController::class);
 
         Route::delete('/members/graduated', [MemberController::class, 'destroyGraduated'])->name('members.destroy.graduated');
+
+        // update rute untuk halaman konfirmasi dan eksekusi naik kelas
+        Route::get('/members/promotion-portal', [MemberController::class, 'showPromotionPortal'])->name('members.promotion.portal');
+        Route::post('/members/promote-all', [MemberController::class, 'promoteAllStudents'])->name('members.promote.all');
 
         Route::resource('members', MemberController::class)->except(['create', 'store']);
 

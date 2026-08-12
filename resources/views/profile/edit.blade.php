@@ -36,9 +36,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-                        {{-- ========================================== --}}
                         {{-- KIRI: BAGIAN FOTO PROFIL --}}
-                        {{-- ========================================== --}}
                         <div class="md:col-span-1 flex flex-col items-center">
 
                             {{-- Tampilan Foto --}}
@@ -65,7 +63,7 @@
                                     <label for="profile_photo" class="block text-sm font-bold text-gray-700 mb-2 text-center">
                                         Upload Foto Baru
                                     </label>
-                                    <input type="file" id="profile_photo" name="profile_photo"
+                                    <input type="file" id="profile_photo" name="profile_photo" accept="image/*"
                                            class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer border border-gray-200 rounded-xl p-1 transition @error('profile_photo') border-rose-500 @enderror">
 
                                     @error('profile_photo')
@@ -75,17 +73,22 @@
                             @endif
                         </div>
 
-                        {{-- ========================================== --}}
-                        {{-- KANAN: BAGIAN DATA DIRI --}}
-                        {{-- ========================================== --}}
                         <div class="md:col-span-2 space-y-6">
 
-                            {{-- Nama Lengkap (Dikunci) --}}
+                            {{-- Nama Lengkap --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
-                                <input type="text" value="{{ old('name', $user->name) }}" disabled
-                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed">
-                                <p class="mt-1.5 text-xs text-gray-400 font-medium">Nama tidak dapat diubah. Hubungi petugas jika ada kesalahan.</p>
+                                <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
+                                <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
+                                       @if(auth()->user()->role !== 'superadmin') disabled @endif
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200
+                                              @if(auth()->user()->role !== 'superadmin') bg-gray-100 text-gray-500 cursor-not-allowed
+                                              @else focus:border-gray-500 focus:ring-4 focus:ring-gray-50 outline-none transition bg-gray-50 focus:bg-white @endif">
+                                @if(auth()->user()->role !== 'superadmin')
+                                    <p class="mt-1.5 text-xs text-gray-400 font-medium">Nama tidak dapat diubah. Hubungi petugas jika ada kesalahan.</p>
+                                @endif
+                                @error('name')
+                                    <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             {{-- Email (Dikunci) --}}

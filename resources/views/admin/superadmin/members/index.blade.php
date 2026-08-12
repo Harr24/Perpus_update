@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    {{-- Header Halaman & Tombol Aksi --}}
+    {{-- Bagian header yang isinya judul halaman dan kumpulan tombol aksi di kanan --}}
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Kelola Anggota</h2>
@@ -9,40 +9,49 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-            {{-- Tombol Hapus Massal (Siswa Lulus) --}}
+            {{-- Tombol hapus massal ini cuma muncul kalau ada siswa yang statusnya lulus --}}
             @if(isset($graduatedCount) && $graduatedCount > 0)
                 <button onclick="openBulkDeleteModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl font-bold shadow-sm hover:bg-rose-100 transition text-sm">
-                    <span>🧹</span> Bersihkan Siswa Lulus ({{ $graduatedCount }})
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Bersihkan Siswa Lulus ({{ $graduatedCount }})
                 </button>
             @endif
 
+            {{-- Update: Ini tombol baru untuk masuk ke halaman portal kenaikan kelas --}}
+            <a href="{{ route('admin.superadmin.members.promotion.portal') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-bold shadow-sm hover:bg-amber-100 transition text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Portal Kenaikan Kelas
+            </a>
+
             <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
-                <span>⬅️</span> Kembali
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali
             </a>
         </div>
     </div>
 
-    {{-- Pesan Sukses & Error --}}
+    {{-- Tempat munculnya pesan sukses atau pesan error --}}
     @if(session('success'))
         <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold flex items-center gap-3">
-            <span class="text-xl">✅</span> {{ session('success') }}
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="mb-6 p-4 bg-rose-50 text-rose-700 border border-rose-100 rounded-xl font-bold flex items-center gap-3">
-            <span class="text-xl">⚠️</span> {{ session('error') }}
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            {{ session('error') }}
         </div>
     @endif
 
-    {{-- Kontainer Utama --}}
+    {{-- Kotak putih utama tempat tabel dan pencarian berada --}}
     <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 overflow-hidden">
 
-        {{-- Filter & Search Bar --}}
+        {{-- Area form untuk dropdown filter dan kotak pencarian --}}
         <div class="p-6 border-b border-gray-100 bg-gray-50/50">
             <form action="{{ route('admin.superadmin.members.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-center justify-between">
 
-                {{-- Dropdown Filter --}}
                 <div class="w-full md:w-auto flex-shrink-0">
                     <select name="filter_role" onchange="this.form.submit()" class="w-full border border-gray-200 bg-white rounded-xl text-sm font-bold text-gray-700 py-2.5 px-4 focus:ring-slate-50 focus:border-slate-500 cursor-pointer shadow-sm outline-none transition">
                         <option value="">Semua Anggota</option>
@@ -53,7 +62,6 @@
                     </select>
                 </div>
 
-                {{-- Input Pencarian --}}
                 <div class="flex w-full md:w-auto items-center">
                     <input type="text" name="search" placeholder="Cari nama, email, atau NIS..." value="{{ request('search') }}"
                            class="border border-r-0 border-gray-200 bg-white rounded-l-xl w-full md:w-72 py-2.5 px-4 text-sm font-medium focus:ring-slate-50 focus:border-slate-500 shadow-sm outline-none transition">
@@ -61,7 +69,7 @@
                         Cari
                     </button>
 
-                    {{-- Tombol Reset (Muncul jika sedang filter) --}}
+                    {{-- Tombol reset ini cuma nongol kalau kita lagi nyari sesuatu atau pakai filter --}}
                     @if(request('search') || request('filter_role'))
                         <a href="{{ route('admin.superadmin.members.index') }}" class="text-rose-500 hover:text-rose-600 text-sm font-bold ml-4 transition underline underline-offset-2">
                             Reset
@@ -71,7 +79,7 @@
             </form>
         </div>
 
-        {{-- Tabel Data --}}
+        {{-- Area tabel data anggota --}}
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead class="bg-white border-b border-gray-100">
@@ -86,8 +94,6 @@
                 <tbody class="divide-y divide-gray-100 text-gray-700">
                     @forelse ($members as $member)
                         <tr class="hover:bg-gray-50/80 transition duration-200">
-
-                            {{-- Info Anggota (Nama & Email) --}}
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm overflow-hidden shrink-0 border border-gray-200 shadow-sm">
@@ -104,7 +110,6 @@
                                 </div>
                             </td>
 
-                            {{-- ID / NIS --}}
                             <td class="px-6 py-4">
                                 @if ($member->role == 'siswa')
                                     <span class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-lg text-[11px] font-bold font-mono border border-gray-200">
@@ -115,7 +120,6 @@
                                 @endif
                             </td>
 
-                            {{-- Kelas / Mapel --}}
                             <td class="px-6 py-4 text-sm font-bold text-gray-700">
                                 @if ($member->role == 'siswa')
                                     @if ($member->class == 'Lulus')
@@ -136,10 +140,8 @@
                                 @endif
                             </td>
 
-                            {{-- Role & Status --}}
                             <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1.5 items-start">
-                                    {{-- Badge Role --}}
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border
                                         @if($member->role == 'siswa') bg-indigo-50 text-indigo-700 border-indigo-100
                                         @elseif($member->role == 'guru') bg-rose-50 text-rose-700 border-rose-100
@@ -148,7 +150,6 @@
                                         {{ $member->role }}
                                     </span>
 
-                                    {{-- Badge Status --}}
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border
                                         @if($member->account_status == 'active') bg-emerald-50 text-emerald-700 border-emerald-100
                                         @else bg-amber-50 text-amber-700 border-amber-100 @endif">
@@ -158,7 +159,6 @@
                                 </div>
                             </td>
 
-                            {{-- Aksi --}}
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
                                     <a href="{{ route('admin.superadmin.members.show', $member->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-[11px] font-bold transition border border-blue-100" title="Detail">
@@ -177,7 +177,7 @@
                         <tr>
                             <td colspan="5" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-5xl mb-4 opacity-50">👥</span>
+                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                     <h3 class="text-lg font-bold text-gray-900">Tidak ada data</h3>
                                     <p class="text-gray-500 mt-1">Data anggota tidak ditemukan atau kosong.</p>
                                 </div>
@@ -188,9 +188,7 @@
             </table>
         </div>
 
-        {{-- ========================================================== --}}
-        {{-- 🔥 PERBAIKAN PAGINATION (TAMPILAN RAPI DENGAN TAILWIND) 🔥 --}}
-        {{-- ========================================================== --}}
+        {{-- Nomor halaman kalau datanya sudah sangat banyak --}}
         @if ($members->hasPages())
             <div class="p-6 border-t border-gray-100 bg-white">
                 {{ $members->withQueryString()->links('pagination::tailwind') }}
@@ -198,9 +196,7 @@
         @endif
     </div>
 
-    {{-- ================================================= --}}
-    {{-- MODAL HAPUS SATUAN --}}
-    {{-- ================================================= --}}
+    {{-- Desain pop up modal untuk hapus satu anggota --}}
     <div id="deleteModal" class="fixed inset-0 z-[9999] hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
@@ -208,7 +204,7 @@
                 <div class="bg-white px-6 pt-6 pb-6">
                     <div class="sm:flex sm:items-start">
                         <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <span class="text-rose-600 text-xl">⚠️</span>
+                            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-extrabold text-gray-900">Hapus Anggota</h3>
@@ -233,15 +229,16 @@
         </div>
     </div>
 
-    {{-- ================================================= --}}
-    {{-- MODAL HAPUS MASSAL (BULK DELETE) --}}
-    {{-- ================================================= --}}
+    {{-- Desain pop up modal untuk menghapus siswa yang sudah lulus --}}
     <div id="bulkDeleteModal" class="fixed inset-0 z-[9999] hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div class="relative bg-white rounded-[1.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-md w-full border-t-4 border-rose-600">
                 <div class="bg-white px-6 pt-6 pb-6">
-                    <h3 class="text-xl font-extrabold text-gray-900 mb-2 flex items-center gap-2"><span>🧹</span> Hapus Massal Siswa Lulus</h3>
+                    <h3 class="text-xl font-extrabold text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Hapus Massal Siswa Lulus
+                    </h3>
                     <p class="text-sm text-gray-500 leading-relaxed">
                         Anda akan menghapus permanen <strong>{{ $graduatedCount ?? 0 }} akun siswa</strong> yang berstatus lulus/alumni. <br><br>
                         <span class="text-[11px] text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded uppercase tracking-wider border border-rose-100">Penting</span><br>
@@ -263,7 +260,7 @@
         </div>
     </div>
 
-    {{-- Script Modal --}}
+    {{-- Kumpulan script untuk ngebuka dan nutup modal --}}
     <script>
         const deleteModal = document.getElementById('deleteModal');
         const deleteForm = document.getElementById('deleteForm');
@@ -285,7 +282,7 @@
             bulkDeleteModal.classList.add('hidden');
         }
 
-        // Tutup modal jika klik di luar kotak modal
+        // Biar pop up tertutup otomatis kalau user ngeklik sembarang tempat di luar kotak putihnya
         window.onclick = function(event) {
             if (event.target.classList.contains('bg-slate-900/60')) {
                 closeDeleteModal();

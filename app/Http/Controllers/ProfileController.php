@@ -27,12 +27,12 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        
+
         $majors = [];
         if ($user->role === 'siswa') {
             $majors = Major::orderBy('name', 'asc')->get();
         }
-        
+
         return view('profile.edit', compact('user', 'majors'));
     }
 
@@ -50,27 +50,23 @@ class ProfileController extends Controller
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // ==========================================================
-        // --- LOGIKA UPDATE FOTO (GANTI FOTO) ---
-        // ==========================================================
+        //  LOGIKA UPDATE FOTO (GANTI FOTO)
         if ($request->hasFile('profile_photo')) {
             // Hapus foto lama jika ada secara fisik
             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
-            
+
             // Simpan foto baru
             $path = $request->file('profile_photo')->store('profile-photos', 'public');
             $user->profile_photo = $path;
         }
 
-        // ==========================================================
-        // --- LOGIKA PENYIMPANAN DATA ---
-        // ==========================================================
+        // Save data
         // Hanya simpan data yang diizinkan ubah
         $user->phone_number = $request->phone_number;
 
-        // Logika simpan password
+        //  simpan password
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -82,7 +78,6 @@ class ProfileController extends Controller
 
     /**
      * Menghapus foto profil pengguna (Tombol Hapus).
-     * Method BARU ditambahkan di sini.
      */
     public function deletePhoto()
     {
@@ -90,7 +85,7 @@ class ProfileController extends Controller
 
         // Cek apakah user punya foto profil di database
         if ($user->profile_photo) {
-            
+
             // 1. Hapus File Fisik di Storage (Cek dulu biar tidak error)
             if (Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);

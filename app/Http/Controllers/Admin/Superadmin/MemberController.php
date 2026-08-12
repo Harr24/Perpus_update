@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin\Superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Major;
-use App\Models\Borrowing; // ✅ WAJIB IMPORT MODEL INI
+use App\Models\Borrowing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
@@ -45,18 +46,18 @@ class MemberController extends Controller
 
         // 4. Ambil Data dengan Pagination
         $members = $query->orderBy('name', 'asc')->paginate(15);
-        
+
         // Pastikan parameter filter tetap ada saat pindah halaman (pagination)
         $members->appends($request->all());
 
         // 5. Hitung Siswa Lulus (Untuk tombol Hapus Masal)
         $graduatedCount = User::where('role', 'siswa')->where('class', 'Lulus')->count();
-        
+
         return view('admin.superadmin.members.index', compact('members', 'graduatedCount'));
     }
 
     /**
-     * 🔥 FITUR BARU: Menampilkan Detail Anggota & Riwayat Peminjaman
+     *  Detail Anggota & Riwayat Peminjaman
      */
     public function show(User $member)
     {
@@ -81,7 +82,7 @@ class MemberController extends Controller
     {
         // Ambil data Jurusan untuk dropdown di view
         $majors = Major::orderBy('name', 'asc')->get();
-        
+
         return view('admin.superadmin.members.edit', compact('member', 'majors'));
     }
 
@@ -91,7 +92,7 @@ class MemberController extends Controller
     public function update(Request $request, User $member)
     {
         // --- 1. PERSIAPAN DATA SEBELUM VALIDASI ---
-        
+
         if ($request->role == 'siswa') {
             // Jika Siswa Lulus, dan input class kosong (karena disabled di form),
             // kita set manual agar validasi tidak gagal.
@@ -101,7 +102,7 @@ class MemberController extends Controller
 
             // Kosongkan data guru
             $request->merge(['subject' => null]);
-        } 
+        }
         elseif ($request->role == 'guru') {
             // Kosongkan data siswa
             $request->merge([
@@ -119,12 +120,12 @@ class MemberController extends Controller
             'role' => 'required|in:siswa,guru,petugas',
             'account_status' => 'required|in:pending,active,rejected,suspended',
             'password' => 'nullable|min:8|confirmed',
-            
+
             // Validasi SISWA (Wajib jika role = siswa)
             'nis' => ['nullable', Rule::requiredIf($request->role == 'siswa'), 'max:20'],
             'class' => ['nullable', Rule::requiredIf($request->role == 'siswa'), 'in:X,XI,XII,Lulus'],
             'major' => ['nullable', Rule::requiredIf($request->role == 'siswa'), 'exists:majors,name'],
-            
+
             // Validasi GURU (Wajib jika role = guru)
             'subject' => ['nullable', Rule::requiredIf($request->role == 'guru'), 'max:100'],
         ];
@@ -143,7 +144,7 @@ class MemberController extends Controller
         $member->class = $request->class;
         $member->major = $request->major;
         $member->subject = $request->subject;
-        
+
         // Bersihkan kolom legacy
         $member->class_name = null;
 
@@ -159,7 +160,7 @@ class MemberController extends Controller
     }
 
     /**
-     * 🔥 UPDATE: Hapus satu anggota dengan pengecekan pinjaman
+     * Hapus satu anggota dengan pengecekan pinjaman
      */
     public function destroy(User $member)
     {
@@ -178,7 +179,7 @@ class MemberController extends Controller
     }
 
     /**
-     * 🔥 UPDATE: Hapus Massal dengan pengecekan pinjaman (SKIP yang masih pinjam)
+     * Hapus Massal dengan pengecekan pinjaman (SKIP yang masih pinjam)
      */
     public function destroyGraduated()
     {
@@ -219,5 +220,36 @@ class MemberController extends Controller
             return redirect()->route('admin.superadmin.members.index')
                              ->with('error', "Gagal menghapus masal. Semua $skippedCount siswa lulus masih memiliki tanggungan buku!");
         }
+    }
+
+    // KENAIKAN KELAS
+
+    /**
+     * Menampilkan halaman konfirmasi naik kelas
+     */
+    public function showPromotionPortal()
+    {
+        return view('admin.superadmin.members.promotion-portal');
+    }
+
+    /**
+     * Mengecek password dan menjalankan perintah terminal naik kelas
+     */
+    public function promoteAllStudents(Request $request)
+    {
+        $request->validate([
+            'password' => 'required',
+        ]);
+
+        // cocokkan password yang diketik dengan password akun superadmin saat ini
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->with('error', 'Password salah! Aksi dibatalkan demi keamanan.');
+        }
+
+        // jalankan perintah terminal secara gaib di belakang layar
+        Artisan::call('app:promote-students');
+
+        // kembalikan ke halaman daftar anggota dengan pesan sukses
+        return redirect()->route('admin.superadmin.members.index')->with('success', 'Berhasil! Seluruh siswa telah dinaikkan kelasnya sesuai sistem.');
     }
 }
