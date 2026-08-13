@@ -140,7 +140,7 @@
         </div>
 
         <div class="shrink-0 w-full sm:w-auto">
-            <a href="{{ route('catalog.index') }}" class="flex items-center justify-center gap-2 bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition shadow-sm text-sm">
+            <a href="{{ route('internal.catalog.all') }}" class="flex items-center justify-center gap-2 bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition shadow-sm text-sm">
                 Katalog Buku <span>&rarr;</span>
             </a>
         </div>

@@ -271,8 +271,6 @@
                     <div class="col-12 text-center"><p class="text-muted">Genre belum ditambahkan.</p></div>
                 @endforelse
             </div>
-            {{-- ==================================================== --}}
-
         </div>
 
         {{-- Buku Favorit --}}

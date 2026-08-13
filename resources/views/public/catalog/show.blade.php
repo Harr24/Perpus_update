@@ -43,7 +43,7 @@
     </nav>
 
     <main class="container my-4">
-        
+
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -56,7 +56,7 @@
                 <div class="row">
                     {{-- Kolom Kiri: Gambar Sampul --}}
                     <div class="col-md-4 text-center mb-4 mb-md-0">
-                        <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : 'https://placehold.co/300x450/E91E63/FFFFFF?text=No+Cover' }}" 
+                        <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : 'https://placehold.co/300x450/E91E63/FFFFFF?text=No+Cover' }}"
                              class="cover-image" alt="Sampul {{ $book->title }}">
                     </div>
 
@@ -66,7 +66,7 @@
                         <p class="text-muted">oleh {{ $book->author }}</p>
                         <div>
                             <span class="badge bg-danger mb-3">{{ $book->genre->name }}</span>
-                            
+
                             @switch($book->book_type)
                                 @case('paket')
                                     <span class="badge bg-info text-dark mb-3">Buku Paket</span>
@@ -82,13 +82,11 @@
                             @endswitch
                             </div>
 
-                        {{-- ========================================================== --}}
                         {{-- --- TAMBAHAN BARU UNTUK LOKASI RAK --- --}}
                         <p class="mt-3">
                             <strong>Lokasi Rak:</strong> {{ optional($book->shelf)->name ?? 'Belum Diatur' }}
                         </p>
-                        {{-- ========================================================== --}}
-                        
+
                         {{-- Menampilkan Sinopsis --}}
                         @if ($book->synopsis)
                             <hr>
@@ -101,7 +99,6 @@
                 <hr class="my-4">
 
                 @auth
-                    {{-- ========================================================== --}}
                     @php
                         // Cek HANYA apakah buku ini adalah 'paket'
                         $isBookPackage = ($book->book_type == 'paket');
@@ -119,8 +116,8 @@
                                     <div class="row align-items-end">
                                         <div class="col-md-6 mb-3 mb-md-0">
                                             <label for="quantity" class="form-label fw-semibold">Jumlah yang ingin dipinjam:</label>
-                                            <input type="number" name="quantity" id="quantity" class="form-control" 
-                                                   min="1" max="{{ $book->available_copies_count }}" 
+                                            <input type="number" name="quantity" id="quantity" class="form-control"
+                                                   min="1" max="{{ $book->available_copies_count }}"
                                                    placeholder="Maks: {{ $book->available_copies_count }}" required>
                                         </div>
                                         <div class="col-md-6">

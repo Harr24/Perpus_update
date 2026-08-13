@@ -30,8 +30,23 @@
             </div>
         @endauth
 
-        <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative z-10">
-            @yield('content')
+        {{-- PERUBAHAN DI SINI: Tambah flex flex-col pada main --}}
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative z-10 flex flex-col">
+
+            {{-- Wrapper flex-1 agar konten menolak footer ke bawah --}}
+            <div class="flex-1">
+                @yield('content')
+            </div>
+
+            {{-- FOOTER INTERNAL --}}
+            <footer class="mt-10 pt-6 pb-2 border-t border-gray-200/60">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p class="text-sm font-medium text-gray-500 text-center md:text-left">
+                        &copy; {{ date('Y') }} <span class="font-extrabold text-rose-700">Perpustakaan SMK Multicomp</span>.
+                    </p>
+                </div>
+            </footer>
+
         </main>
     </div>
 

@@ -15,7 +15,12 @@ class BorrowingController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $borrowings = Borrowing::where('user_id', $userId)->with('bookCopy.book.genre')->latest('borrowed_at')->get();
+        //paginate(10) agar fungsi links()
+        $borrowings = Borrowing::where('user_id', $userId)
+                        ->with('bookCopy.book.genre')
+                        ->latest('borrowed_at')
+                        ->paginate(10);
+
         return view('borrowings.index', compact('borrowings'));
     }
 

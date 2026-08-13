@@ -61,6 +61,10 @@ Route::middleware('auth')->group(function () {
     // HAPUS FOTO PROFIL
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
+    // --- TAMBAHAN BARU: RUTE KATALOG INTERNAL (TAILWIND - KHUSUS USER LOGIN) ---
+    Route::get('/internal/catalog', [BookCatalogController::class, 'allBooks'])->name('internal.catalog.all');
+    Route::get('/internal/book/{book}', [BookCatalogController::class, 'show'])->name('internal.catalog.show');
+
     // RUTE PEMINJAMAN
     Route::post('/borrow/bulk', [BorrowingController::class, 'storeBulk'])->name('borrow.store.bulk');
     Route::get('/borrow/request/{book_copy}', [BorrowingController::class, 'create'])->name('borrow.create');
@@ -72,9 +76,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/verifikasi-siswa', [VerificationController::class, 'index'])->name('verification.index');
         Route::post('/verifikasi-siswa/{user}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
         Route::post('/verifikasi-siswa/{user}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
-
-        // Kodingan di bawah ini dimatikan karena method di controller sudah dihapus (diganti Storage::url di blade)
-        // Route::get('/verifikasi-siswa/lihat-kartu/{user}', [VerificationController::class, 'showStudentCard'])->name('verification.showCard');
 
         // RUTE SIRKULASI MEJA (PEMINJAMAN LANGSUNG OLEH PETUGAS)
         Route::get('/direct-borrow', [\App\Http\Controllers\Admin\Petugas\DirectBorrowController::class, 'create'])->name('direct_borrow.create');

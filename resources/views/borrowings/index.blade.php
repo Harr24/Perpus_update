@@ -34,11 +34,13 @@
                         @php
                             $isOverdue = $borrow->status == 'dipinjam' && \Carbon\Carbon::parse($borrow->due_at)->lt(now());
                             $isRejected = $borrow->status == 'rejected';
+                            // Menghitung penomoran yang benar berdasarkan pagination
+                            $rowNumber = ($borrowings->currentPage() - 1) * $borrowings->perPage() + $index + 1;
                         @endphp
 
                         <tr class="hover:bg-gray-50/50 transition duration-200 {{ $isRejected ? 'opacity-60' : '' }}">
                             <td class="px-6 py-4 text-sm text-gray-600 font-medium">
-                                {{ $index + 1 }}
+                                {{ $rowNumber }}
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-sm font-bold text-gray-900 line-clamp-2">
@@ -83,8 +85,8 @@
                                                 <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Terlambat
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Dipinjam
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Dipinjam
                                             </span>
                                         @endif
                                         @break
@@ -104,7 +106,9 @@
                                     <span class="text-4xl mb-3">📭</span>
                                     <h3 class="text-lg font-bold text-gray-900">Belum ada riwayat</h3>
                                     <p class="text-gray-500 mt-1">Anda belum pernah meminjam buku. Yuk, mulai membaca!</p>
-                                    <a href="{{ route('catalog.index') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition">
+
+                                    {{-- PERBAIKAN BUG: Rute diganti menjadi internal.catalog.all --}}
+                                    <a href="{{ route('internal.catalog.all') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition">
                                         Lihat Katalog Buku
                                     </a>
                                 </div>
@@ -114,5 +118,12 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- AREA PAGINATION PER 10 BARIS --}}
+        @if($borrowings->hasPages())
+            <div class="px-6 py-4 bg-gray-50/30 border-t border-gray-100">
+                {{ $borrowings->links('pagination::tailwind') }}
+            </div>
+        @endif
     </div>
 @endsection

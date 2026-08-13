@@ -42,12 +42,12 @@
     </nav>
 
     <main class="container my-4">
-        
+
         <div class="card">
             <div class="card-body p-lg-5">
                 <div class="row">
                     <div class="col-md-4 text-center mb-4 mb-md-0">
-                        <img src="{{ $book->cover_image ? Storage::url($book->cover_image) : 'https://via.placeholder.com/300x400.png?text=No+Cover' }}" 
+                        <img src="{{ $book->cover_image ? Storage::url($book->cover_image) : 'https://via.placeholder.com/300x400.png?text=No+Cover' }}"
                              class="cover-image" alt="Sampul {{ $book->title }}">
                     </div>
 
@@ -55,14 +55,10 @@
                         <h1 class="h2 fw-bold">{{ $book->title }}</h1>
                         <p class="text-muted">oleh {{ $book->author }}</p>
                         <span class="badge bg-danger mb-3">{{ $book->genre->name }}</span>
-                        
-                        {{-- ==================================================== --}}
-                        {{-- ========== PASTIKAN BLOK KODE INI ADA ========== --}}
-                        {{-- ==================================================== --}}
+
                         @if ($book->synopsis)
                             <p class="book-synopsis mt-3">{!! nl2br(e($book->synopsis)) !!}</p>
                         @endif
-                        {{-- ==================================================== --}}
 
                     </div>
                 </div>
@@ -79,7 +75,7 @@
                         Anda harus <a href="{{ route('login') }}" class="alert-link">login</a> untuk dapat meminjam buku.
                     </div>
                 @endguest
-                
+
             </div>
         </div>
     </main>

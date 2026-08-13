@@ -8,9 +8,12 @@
     </div>
 
     <div class="flex items-center gap-4">
-    @unless(request()->routeIs('dashboard'))
-        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-5 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
-                <span>⬅️</span> Kembali
+
+    @unless(request()->routeIs('dashboard', 'internal.catalog.show'))
+        <a href="{{ url()->previous() }}" class="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Kembali
+        </a>
     @endunless
         </a>
         <div class="flex items-center gap-3 pl-2 pr-1 py-1 bg-white/60 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition cursor-pointer" onclick="window.location.href='{{ route('profile.edit') }}'">

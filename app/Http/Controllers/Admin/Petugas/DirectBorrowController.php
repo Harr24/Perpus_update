@@ -84,13 +84,10 @@ class DirectBorrowController extends Controller
                 $copies = BookCopy::whereIn('id', $copyIds)->where('status', 'tersedia')->lockForUpdate()->get();
 
                 foreach ($copies as $copy) {
-
-                    // ==========================================================
-                    // --- LOGIKA BATAS WAKTU (JATUH TEMPO) ---
+                    //  LOGIKA BATAS WAKTU (JATUH TEMPO)
                     // 1. Jika peminjam adalah Guru -> Tidak ada batas waktu (null)
                     // 2. Jika tipe buku adalah Laporan -> Tidak ada batas waktu (null)
                     // 3. Selain kondisi di atas (Siswa pinjam Reguler/Paket) -> 7 Hari Kerja
-                    // ==========================================================
                     $dueDate = null;
 
                     if ($user->role !== 'guru' && $copy->book->book_type !== 'laporan') {

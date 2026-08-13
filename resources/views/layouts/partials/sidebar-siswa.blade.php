@@ -15,7 +15,7 @@
 
         <span class="block px-4 pt-6 pb-2 text-[11px] font-bold text-gray-400 tracking-wider uppercase">Pustaka</span>
 
-        <a href="{{ route('catalog.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('catalog.*') ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-indigo-700' }}">
+        <a href="{{ route('internal.catalog.all') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('catalog.*') ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-500 font-semibold hover:bg-gray-50 hover:text-indigo-700' }}">
             <span class="text-lg">📖</span> Katalog Buku
         </a>
 

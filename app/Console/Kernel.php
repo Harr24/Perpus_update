@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         //          tanggal 1,
         //          jam 1:00 pagi (Waktu Server).
 
-        $schedule->command('app:promote-students')->yearlyOn(7, 1, '01:00');
+         //$schedule->command('app:promote-students')->yearlyOn(7, 1, '01:00');
     }
 
     /**

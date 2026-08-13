@@ -51,10 +51,7 @@ class BookCatalogController extends Controller
             ->limit(10)
             ->get();
 
-
-        // ==========================================================
-        // ---  Top Readers (Juara Membaca) ---
-        // ==========================================================
+        // Top Readers (Juara Membaca)
         $now = now();
         $currentYear = $now->year;
         // Tentukan Semester (Jan-Jun atau Jul-Des)
@@ -78,11 +75,6 @@ class BookCatalogController extends Controller
             ->orderBy('borrowings_count', 'desc') // Urutkan dari terbanyak
             ->take(3) // Ambil 3 Juara
             ->get();
-
-        // ==========================================================
-        // --- AKHIR ---
-        // ==========================================================
-
 
         // 3. Materi Pembelajaran
         $learningMaterials = LearningMaterial::where('is_active', true)
@@ -158,6 +150,14 @@ class BookCatalogController extends Controller
         }
 
         $books = $booksQuery->paginate(12)->withQueryString();
+
+        // LOGIKA PENENTUAN ALAM (VIEW)
+        if (auth()->check()) {
+            // Jika user sudah login, arahkan ke view Internal (Tailwind)
+            return view('catalog.internal-index', compact('books', 'genres'));
+        }
+
+        // Jika belum login (tamu), arahkan ke view Publik (Bootstrap)
         return view('public.catalog.all_books', compact('books', 'genres'));
     }
 
@@ -170,6 +170,14 @@ class BookCatalogController extends Controller
                $query->where('status', 'tersedia');
            }
        ]);
+
+       // LOGIKA PENENTUAN ALAM (VIEW)
+       if (auth()->check()) {
+           // Jika user sudah login, arahkan ke view Internal (Tailwind)
+           return view('catalog.internal-show', compact('book'));
+       }
+
+       // Jika belum login (tamu), arahkan ke view Publik (Bootstrap)
        return view('public.catalog.show', compact('book'));
     }
 

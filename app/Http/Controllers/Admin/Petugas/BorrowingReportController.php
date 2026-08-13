@@ -19,9 +19,9 @@ class BorrowingReportController extends Controller
         $search = $request->input('search');
         $month = $request->input('month');
         $year = $request->input('year', date('Y'));
-        
+
         // Ambil input status dari filter
-        $status = $request->input('status'); 
+        $status = $request->input('status');
 
         // Query dasar
         $borrowingsQuery = Borrowing::with(['user', 'bookCopy.book', 'approvedBy', 'returnedBy'])
@@ -47,12 +47,12 @@ class BorrowingReportController extends Controller
         $borrowingsQuery->when($month, function ($query, $month) {
             return $query->whereMonth('borrowed_at', $month);
         });
-        
+
         // Filter tahun
         $borrowingsQuery->whereYear('borrowed_at', $year);
 
         $borrowings = $borrowingsQuery->paginate(15)->withQueryString();
-        
+
         return view('admin.petugas.reports.borrowings.index', compact('borrowings'));
     }
 
@@ -99,7 +99,7 @@ class BorrowingReportController extends Controller
             return $query->whereMonth('borrowed_at', $month);
         });
         $borrowingsQuery->whereYear('borrowed_at', $year);
-        
+
         $dataToExport = $borrowingsQuery->get();
 
         $fileName = 'laporan-peminjaman-' . date('d-m-Y-H-i') . '.xlsx';
@@ -107,7 +107,7 @@ class BorrowingReportController extends Controller
 
         // Header Excel
         $writer->addRow([
-            'Nama Peminjam', 'Role', 'Kelas / Mapel', 'Judul Buku', 'Kode Eksemplar', 
+            'Nama Peminjam', 'Role', 'Kelas / Mapel', 'Judul Buku', 'Kode Eksemplar',
             'Tanggal Pinjam', 'Tanggal Kembali', 'Status Pengembalian',
             'Petugas Approval', 'Petugas Pengembalian'
         ]);
@@ -115,26 +115,23 @@ class BorrowingReportController extends Controller
         foreach ($dataToExport as $item) {
             $statusText = ($item->status === 'missing') ? 'HILANG' : 'Dikembalikan';
 
-            // ==========================================================
-            // 🔥 LOGIKA PENENTUAN KELAS / MAPEL 🔥
-            // ==========================================================
+            // LOGIKA PENENTUAN KELAS / MAPEL
             $displayClass = 'N/A';
 
             if ($item->user) {
                 if ($item->user->role == 'guru') {
                     // Jika Guru, ambil Subject (Mata Pelajaran)
-                    $displayClass = $item->user->subject ?? 'Guru'; 
+                    $displayClass = $item->user->subject ?? 'Guru';
                 } else {
                     // Jika Siswa, gabungkan Kelas + Jurusan
                     $kelas = $item->user->class;
                     $jurusan = $item->user->major;
-                    
+
                     if (!empty($kelas) || !empty($jurusan)) {
                         $displayClass = trim("$kelas $jurusan");
                     }
                 }
             }
-            // ==========================================================
 
             $writer->addRow([
                 'Nama Peminjam'         => $item->user->name ?? 'User Terhapus',
@@ -149,7 +146,7 @@ class BorrowingReportController extends Controller
                 'Petugas Pengembalian'  => $item->returnedBy->name ?? 'N/A',
             ]);
         }
-        
+
         return response()->download(storage_path('app/' . $fileName))->deleteFileAfterSend(true);
     }
 }
