@@ -61,9 +61,10 @@ Route::middleware('auth')->group(function () {
     // HAPUS FOTO PROFIL
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
-    // --- TAMBAHAN BARU: RUTE KATALOG INTERNAL (TAILWIND - KHUSUS USER LOGIN) ---
+    // --- TRUTE KATALOG INTERNAL (KHUSUS USER LOGIN) ---
     Route::get('/internal/catalog', [BookCatalogController::class, 'allBooks'])->name('internal.catalog.all');
     Route::get('/internal/book/{book}', [BookCatalogController::class, 'show'])->name('internal.catalog.show');
+    Route::get('/internal/materials', [BookCatalogController::class, 'allMaterials'])->name('internal.catalog.materials');
 
     // RUTE PEMINJAMAN
     Route::post('/borrow/bulk', [BorrowingController::class, 'storeBulk'])->name('borrow.store.bulk');

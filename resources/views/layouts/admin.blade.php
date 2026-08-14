@@ -30,7 +30,7 @@
             </div>
         @endauth
 
-        {{-- PERUBAHAN DI SINI: Tambah flex flex-col pada main --}}
+        {{--Tambah flex flex-col pada main --}}
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative z-10 flex flex-col">
 
             {{-- Wrapper flex-1 agar konten menolak footer ke bawah --}}
@@ -56,6 +56,40 @@
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
     </script>
+
+    @auth
+    <form id="autoLogoutForm" action="{{ route('logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
+
+    <script>
+        let idleTimer;
+        const idleLimit = 180000;
+
+        function logoutUser() {
+            // Submit form logout secara otomatis
+            document.getElementById('autoLogoutForm').submit();
+        }
+
+        function resetIdleTimer() {
+            // Hapus timer yang lama
+            clearTimeout(idleTimer);
+            // Mulai ulang timer dari awal
+            idleTimer = setTimeout(logoutUser, idleLimit);
+        }
+
+        // Daftar interaksi user yang menandakan mereka masih aktif
+        const userActivities = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'wheel'];
+
+        // Pasang sensor (event listener) ke seluruh halaman
+        userActivities.forEach(function(activity) {
+            document.addEventListener(activity, resetIdleTimer, true);
+        });
+
+        // Jalankan timer saat halaman pertama kali dimuat
+        resetIdleTimer();
+    </script>
+    @endauth
 
     {{-- BARIS INI WAJIB ADA UNTUK MENAMPUNG @push('scripts') DARI HALAMAN LAIN --}}
     @stack('scripts')

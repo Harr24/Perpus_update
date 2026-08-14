@@ -171,7 +171,7 @@ class BookCatalogController extends Controller
            }
        ]);
 
-       // LOGIKA PENENTUAN ALAM (VIEW)
+       // LOGIKA (VIEW)
        if (auth()->check()) {
            // Jika user sudah login, arahkan ke view Internal (Tailwind)
            return view('catalog.internal-show', compact('book'));
@@ -216,6 +216,13 @@ class BookCatalogController extends Controller
             ->whereHas('learningMaterials')
             ->orderBy('name')
             ->get();
+        // LOGIKA PENENTUAN ALAM (VIEW)
+        if (auth()->check()) {
+            // Jika user sudah login (Siswa/Guru), arahkan ke view Internal (Tailwind)
+            return view('catalog.internal-materials', compact('materials', 'teachers'));
+        }
+
+        // Jika belum login (tamu), arahkan ke view Publik (Bootstrap)
         return view('public.catalog.all_materials',  compact('materials', 'teachers'));
     }
 }

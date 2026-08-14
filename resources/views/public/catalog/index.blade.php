@@ -1,28 +1,18 @@
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Katalog Buku - Perpustakaan Multicomp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+@extends('layouts.public')
 
+@section('title', 'Katalog Buku - Perpustakaan Multicomp')
+
+@push('styles')
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
+        /* Variabel warna sudah ada di layout, kita tambahkan sisanya */
         :root {
-            --brand-red: #c62828;
             --brand-red-hover: #b71c1c;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            overflow-x: hidden;
-        }
+        body { overflow-x: hidden; }
 
-        /* NAVBAR */
-        .navbar { transition: all 0.3s ease; }
+        /* NAVBAR (Penyesuaian untuk Beranda) */
         .navbar-brand { font-size: 1.25rem; transition: transform 0.3s ease; }
         .navbar-brand:hover { transform: scale(1.05); }
         .navbar-brand img { height: 50px !important; transition: all 0.3s ease; }
@@ -53,7 +43,7 @@
         .search-container .input-group { transition: all 0.3s ease; }
         .search-container .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(198, 40, 40, 0.25); border-color: var(--brand-red); }
 
-        /* SUBJECT CARDS (GENRE) - UPDATE UNTUK ICON */
+        /* SUBJECT CARDS (GENRE) */
         .subject-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1rem; border-radius: 12px; background-color: #fff; border: 2px solid #e9ecef; text-decoration: none; color: #212529; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
         .subject-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(198, 40, 40, 0.1), transparent); transition: left 0.5s ease; }
         .subject-card:hover::before { left: 100%; }
@@ -69,12 +59,10 @@
             margin-bottom: 1rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
-            overflow: hidden; /* Tambahan agar gambar tidak keluar */
+            overflow: hidden;
             position: relative;
         }
-        /* Tambahan style untuk gambar di dalam lingkaran */
         .subject-code img { width: 100%; height: 100%; object-fit: cover; }
-
         .subject-card:hover .subject-code { transform: rotate(360deg) scale(1.1); background: linear-gradient(135deg, var(--brand-red), #e53935); color: white; }
         .subject-name { transition: all 0.3s ease; }
         .subject-card:hover .subject-name { color: var(--brand-red); transform: scale(1.05); }
@@ -117,8 +105,8 @@
         .material-card:hover i { transform: rotate(-10deg) scale(1.1); }
         .material-card-img { height: 180px; object-fit: cover; }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) { .book-cover { height: 250px; } .navbar-brand img { height: 40px !important; } }
+        /* RESPONSIVE & OTHERS */
+        @media (max-width: 768px) { .book-cover { height: 250px; } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .btn-lg { animation: float 3s ease-in-out infinite; }
         html { scroll-behavior: smooth; }
@@ -135,354 +123,348 @@
         .border-primary-red { border-color: var(--brand-red) !important; }
         .bg-primary-red { background-color: var(--brand-red) !important; color: #fff !important; }
     </style>
-</head>
-<body>
-    @include('layouts.partials.header-public')
-    <main>
-        {{-- Hero Slider --}}
-        @if(isset($heroSliders) && $heroSliders->isNotEmpty())
-        <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-indicators">
-                @foreach($heroSliders as $index => $slider)
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
-                @endforeach
+@endpush
+
+@section('content')
+    {{-- Hero Slider --}}
+    @if(isset($heroSliders) && $heroSliders->isNotEmpty())
+    <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            @foreach($heroSliders as $index => $slider)
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
+            @endforeach
+        </div>
+        <div class="carousel-inner">
+            @foreach($heroSliders as $index => $slider)
+                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}" style="background-image: url('{{ asset('storage/' . $slider->image_path) }}');">
+                    <div class="carousel-caption">
+                        @if($slider->title)
+                            <h1 class="display-4 fw-bold mb-3">{{ $slider->title }}</h1>
+                        @endif
+                        @if($slider->description)
+                            <p class="lead d-none d-md-block">{{ $slider->description }}</p>
+                        @endif
+                        @if($slider->link_url)
+                            <a href="{{ $slider->link_url }}" class="btn btn-danger btn-lg mt-3" target="_blank" rel="noopener noreferrer">
+                                BACA SELENGKAPNYA <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        @if($heroSliders->count() > 1)
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+        @endif
+    </div>
+    @endif
+
+    {{-- Intro --}}
+    <div class="bg-white py-5 shadow-sm">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5" data-aos="fade-right">
+                    <img src="{{ asset('images/orangsekolah.png') }}" alt="Ilustrasi siswi membaca buku" class="img-fluid rounded-3 shadow-lg" style="width: 100%; height: auto; max-height: 450px; object-fit: cover;">
+                </div>
+                <div class="col-lg-7" data-aos="fade-left" data-aos-delay="100">
+                    <h2 class="fw-bold display-6" style="color: var(--brand-red);">Apa itu MyMulticompLibrary?</h2>
+                    <p class="lead text-muted mt-3">Ini adalah web perpustakaan digital resmi SMK Multicomp Depok.</p>
+                    <p style="font-size: 1.1rem; line-height: 1.7;">Kami hadir untuk membawa perpustakaan ke dalam genggaman Anda. Di era digital ini, <strong>pentingnya membaca</strong> menjadi semakin krusial untuk membuka wawasan.</p>
+                    <a href="#search-section" class="btn btn-danger btn-lg mt-3"><i class="bi bi-search me-2"></i> Mulai Cari Buku</a>
+                </div>
             </div>
-            <div class="carousel-inner">
-                @foreach($heroSliders as $index => $slider)
-                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}" style="background-image: url('{{ asset('storage/' . $slider->image_path) }}');">
-                        <div class="carousel-caption">
-                            @if($slider->title)
-                                <h1 class="display-4 fw-bold mb-3">{{ $slider->title }}</h1>
-                            @endif
-                            @if($slider->description)
-                                <p class="lead d-none d-md-block">{{ $slider->description }}</p>
-                            @endif
-                            @if($slider->link_url)
-                                <a href="{{ $slider->link_url }}" class="btn btn-danger btn-lg mt-3" target="_blank" rel="noopener noreferrer">
-                                    BACA SELENGKAPNYA <i class="bi bi-arrow-right ms-2"></i>
-                                </a>
+        </div>
+    </div>
+
+    {{-- Jadwal Piket --}}
+    <section class="container my-5">
+        <div class="row">
+            <div class="col-12 text-center mb-4" data-aos="fade-up">
+                <h2 class="fw-bold display-6">Jadwal Piket Perpustakaan</h2>
+                <p class="lead text-muted">Temui petugas yang siap membantu Anda setiap harinya.</p>
+            </div>
+        </div>
+        <div class="row" data-aos="fade-up" data-aos-delay="100">
+            @foreach($days as $dayNumber => $dayName)
+                @php
+                    $isToday = ($dayNumber == $todayDayOfWeek);
+                    $schedules = $schedulesByDay->get($dayNumber);
+                @endphp
+                <div class="col-12 col-sm-6 col-md-6 col-lg mb-4">
+                    <div class="card h-100 shadow-sm {{ $isToday ? 'border-primary-red' : '' }}" style="{{ $isToday ? 'border-width: 2px;' : '' }}">
+                        <div class="card-header {{ $isToday ? 'bg-primary-red' : '' }}">
+                            <h6 class="m-0 font-weight-bold text-center">{{ $dayName }}</h6>
+                        </div>
+                        <div class="card-body" style="min-height: 150px; font-size: 0.9rem;">
+                            @if($schedules && $schedules->isNotEmpty())
+                                <ul class="list-unstyled mb-0">
+                                    @foreach($schedules as $schedule)
+                                        <li class="mb-2">
+                                            <strong>{{ $schedule->user->name }}</strong><br>
+                                            <small class="text-muted">Petugas</small>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <div class="text-center text-muted d-flex flex-column justify-content-center h-100">
+                                    <i class="bi bi-cup-hot" style="font-size: 1.5rem;"></i>
+                                    <small class="mt-2">Jadwal Kosong</small>
+                                </div>
                             @endif
                         </div>
                     </div>
-                @endforeach
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    {{-- Kategori (GENRE) --}}
+    <div class="container py-5" id="search-section">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="fw-bold display-6">Jelajahi Berdasarkan Kategori</h2>
+            <p class="lead text-muted">Temukan koleksi buku favorit Anda berdasarkan subjek.</p>
+        </div>
+        <div class="row justify-content-center mb-5" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-md-8">
+                <div class="search-container">
+                    <form action="{{ route('catalog.all') }}" method="GET">
+                        <div class="input-group input-group-lg shadow-sm">
+                            <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan judul, penulis..." value="{{ request('search') }}" aria-label="Kolom pencarian katalog">
+                            <button class="btn btn-danger" type="submit"><i class="bi bi-search"></i> Cari</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            @if($heroSliders->count() > 1)
-                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
-                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+        </div>
+        {{--ICON GENRE--}}
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3" data-aos="fade-up" data-aos-delay="200">
+            @forelse ($genres as $genre)
+                <div class="col">
+                    <a href="{{ route('catalog.all', ['genre' => $genre->name]) }}" class="subject-card h-100">
+                        <div class="subject-code">
+                            @if($genre->icon)
+                                <img src="{{ asset('storage/' . $genre->icon) }}" alt="{{ $genre->name }}">
+                            @else
+                                {{ strtoupper(substr($genre->name, 0, 2)) }}
+                            @endif
+                        </div>
+                        <div class="subject-name small fw-bolder text-truncate">{{ $genre->name }}</div>
+                    </a>
+                </div>
+            @empty
+                <div class="col-12 text-center"><p class="text-muted">Genre belum ditambahkan.</p></div>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- Buku Favorit --}}
+    <div class="bg-white py-5 shadow-sm" data-aos="fade-up">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0 text-danger"><i class="bi bi-heart-fill me-2"></i> 10 Buku Favorit</h3>
+            </div>
+            @if($favoriteBooks->isNotEmpty())
+                <div id="favoriteBooksCarousel" class="carousel slide">
+                    <div class="carousel-inner">
+                        @foreach ($favoriteBooks->chunk(4) as $index => $chunk)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                <div class="row row-cols-2 row-cols-md-4 g-4">
+                                    @foreach ($chunk as $book)
+                                        <div class="col">@include('public.catalog.partials._book_card', ['book' => $book])</div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#favoriteBooksCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#favoriteBooksCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+                </div>
+            @else
+                <div class="alert alert-info text-center">Belum ada data untuk menentukan buku favorit.</div>
             @endif
         </div>
-        @endif
+    </div>
 
-        {{-- Intro --}}
-        <div class="bg-white py-5 shadow-sm">
-            <div class="container">
-                <div class="row g-5 align-items-center">
-                    <div class="col-lg-5" data-aos="fade-right">
-                        <img src="{{ asset('images/orangsekolah.png') }}" alt="Ilustrasi siswi membaca buku" class="img-fluid rounded-3 shadow-lg" style="width: 100%; height: auto; max-height: 450px; object-fit: cover;">
-                    </div>
-                    <div class="col-lg-7" data-aos="fade-left" data-aos-delay="100">
-                        <h2 class="fw-bold display-6" style="color: var(--brand-red);">Apa itu MyMulticompLibrary?</h2>
-                        <p class="lead text-muted mt-3">Ini adalah web perpustakaan digital resmi SMK Multicomp Depok.</p>
-                        <p style="font-size: 1.1rem; line-height: 1.7;">Kami hadir untuk membawa perpustakaan ke dalam genggaman Anda. Di era digital ini, <strong>pentingnya membaca</strong> menjadi semakin krusial untuk membuka wawasan.</p>
-                        <a href="#search-section" class="btn btn-danger btn-lg mt-3"><i class="bi bi-search me-2"></i> Mulai Cari Buku</a>
-                    </div>
-                </div>
+    {{-- Buku Terbaru --}}
+    <div class="bg-white py-5 mt-5 shadow-sm" data-aos="fade-up">
+         <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0"><i class="bi bi-arrow-down-up me-2"></i> 10 Buku Terbaru</h3>
+                <a href="{{ route('catalog.all', ['sort' => 'latest']) }}" class="btn btn-outline-danger btn-sm">Lihat Semua Buku <i class="bi bi-arrow-right"></i></a>
             </div>
-        </div>
-
-        {{-- Jadwal Piket --}}
-        <section class="container my-5">
-            <div class="row">
-                <div class="col-12 text-center mb-4" data-aos="fade-up">
-                    <h2 class="fw-bold display-6">Jadwal Piket Perpustakaan</h2>
-                    <p class="lead text-muted">Temui petugas yang siap membantu Anda setiap harinya.</p>
-                </div>
-            </div>
-            <div class="row" data-aos="fade-up" data-aos-delay="100">
-                @foreach($days as $dayNumber => $dayName)
-                    @php
-                        $isToday = ($dayNumber == $todayDayOfWeek);
-                        $schedules = $schedulesByDay->get($dayNumber);
-                    @endphp
-                    <div class="col-12 col-sm-6 col-md-6 col-lg mb-4">
-                        <div class="card h-100 shadow-sm {{ $isToday ? 'border-primary-red' : '' }}" style="{{ $isToday ? 'border-width: 2px;' : '' }}">
-                            <div class="card-header {{ $isToday ? 'bg-primary-red' : '' }}">
-                                <h6 class="m-0 font-weight-bold text-center">{{ $dayName }}</h6>
-                            </div>
-                            <div class="card-body" style="min-height: 150px; font-size: 0.9rem;">
-                                @if($schedules && $schedules->isNotEmpty())
-                                    <ul class="list-unstyled mb-0">
-                                        @foreach($schedules as $schedule)
-                                            <li class="mb-2">
-                                                <strong>{{ $schedule->user->name }}</strong><br>
-                                                <small class="text-muted">Petugas</small>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    <div class="text-center text-muted d-flex flex-column justify-content-center h-100">
-                                        <i class="bi bi-cup-hot" style="font-size: 1.5rem;"></i>
-                                        <small class="mt-2">Jadwal Kosong</small>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-
-        {{-- Kategori (GENRE) --}}
-        <div class="container py-5" id="search-section">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="fw-bold display-6">Jelajahi Berdasarkan Kategori</h2>
-                <p class="lead text-muted">Temukan koleksi buku favorit Anda berdasarkan subjek.</p>
-            </div>
-            <div class="row justify-content-center mb-5" data-aos="fade-up" data-aos-delay="100">
-                <div class="col-md-8">
-                    <div class="search-container">
-                        <form action="{{ route('catalog.all') }}" method="GET">
-                            <div class="input-group input-group-lg shadow-sm">
-                                <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan judul, penulis..." value="{{ request('search') }}" aria-label="Kolom pencarian katalog">
-                                <button class="btn btn-danger" type="submit"><i class="bi bi-search"></i> Cari</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {{--ICON GENRE--}}
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3" data-aos="fade-up" data-aos-delay="200">
-                @forelse ($genres as $genre)
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+                @forelse ($latestBooks as $book)
                     <div class="col">
-                        <a href="{{ route('catalog.all', ['genre' => $genre->name]) }}" class="subject-card h-100">
-                            <div class="subject-code">
-                                @if($genre->icon)
-                                    {{-- Jika ada icon, tampilkan gambarnya --}}
-                                    <img src="{{ asset('storage/' . $genre->icon) }}" alt="{{ $genre->name }}">
-                                @else
-                                    {{-- Fallback: Tampilkan inisial --}}
-                                    {{ strtoupper(substr($genre->name, 0, 2)) }}
-                                @endif
-                            </div>
-                            <div class="subject-name small fw-bolder text-truncate">{{ $genre->name }}</div>
-                        </a>
+                        @include('public.catalog.partials._book_card', ['book' => $book])
                     </div>
                 @empty
-                    <div class="col-12 text-center"><p class="text-muted">Genre belum ditambahkan.</p></div>
+                    <div class="col-12 text-center"><div class="alert alert-warning">Belum ada buku baru.</div></div>
                 @endforelse
             </div>
-        </div>
-
-        {{-- Buku Favorit --}}
-        <div class="bg-white py-5 shadow-sm" data-aos="fade-up">
-            <div class="container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="fw-bold mb-0 text-danger"><i class="bi bi-heart-fill me-2"></i> 10 Buku Favorit</h3>
-                </div>
-                @if($favoriteBooks->isNotEmpty())
-                    <div id="favoriteBooksCarousel" class="carousel slide">
-                        <div class="carousel-inner">
-                            @foreach ($favoriteBooks->chunk(4) as $index => $chunk)
-                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                    <div class="row row-cols-2 row-cols-md-4 g-4">
-                                        @foreach ($chunk as $book)
-                                            <div class="col">@include('public.catalog.partials._book_card', ['book' => $book])</div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#favoriteBooksCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#favoriteBooksCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
-                    </div>
-                @else
-                    <div class="alert alert-info text-center">Belum ada data untuk menentukan buku favorit.</div>
-                @endif
+            <div class="text-center mt-5">
+                 <a href="{{ route('catalog.all') }}" class="btn btn-lg btn-danger shadow-lg"><i class="bi bi-grid-3x3-gap-fill me-2"></i> Lihat Semua Buku di Katalog</a>
             </div>
         </div>
+    </div>
 
-        {{-- Buku Terbaru --}}
-        <div class="bg-white py-5 mt-5 shadow-sm" data-aos="fade-up">
-             <div class="container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="fw-bold mb-0"><i class="bi bi-arrow-down-up me-2"></i> 10 Buku Terbaru</h3>
-                    <a href="{{ route('catalog.all', ['sort' => 'latest']) }}" class="btn btn-outline-danger btn-sm">Lihat Semua Buku <i class="bi bi-arrow-right"></i></a>
-                </div>
-                <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
-                    @forelse ($latestBooks as $book)
-                        <div class="col">
-                            @include('public.catalog.partials._book_card', ['book' => $book])
-                        </div>
-                    @empty
-                        <div class="col-12 text-center"><div class="alert alert-warning">Belum ada buku baru.</div></div>
-                    @endforelse
-                </div>
-                <div class="text-center mt-5">
-                     <a href="{{ route('catalog.all') }}" class="btn btn-lg btn-danger shadow-lg"><i class="bi bi-grid-3x3-gap-fill me-2"></i> Lihat Semua Buku di Katalog</a>
-                </div>
-            </div>
+    {{-- Materi Belajar --}}
+    @if(isset($learningMaterials) && $learningMaterials->isNotEmpty())
+    <div class="container py-5 mt-5" data-aos="fade-up">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6">Materi Belajar Terbaru</h2>
+            <p class="lead text-muted">Akses materi tambahan yang dibagikan oleh para guru.</p>
         </div>
-
-        {{-- Materi Belajar --}}
-        @if(isset($learningMaterials) && $learningMaterials->isNotEmpty())
-        <div class="container py-5 mt-5" data-aos="fade-up">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold display-6">Materi Belajar Terbaru</h2>
-                <p class="lead text-muted">Akses materi tambahan yang dibagikan oleh para guru.</p>
-            </div>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                @foreach($learningMaterials as $material)
-                    <div class="col">
-                        <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="material-card h-100 d-flex flex-column text-decoration-none">
-                            <img src="{{ $material->thumbnail_url ?? asset('images/default-material.jpg') }}" class="card-img-top material-card-img" alt="Thumbnail {{ $material->title }}">
-                            <div class="card-body d-flex flex-column p-3">
-                                <h5 class="card-title fw-bold mb-2 text-dark" style="font-size: 1rem;">{{ Str::limit($material->title, 45) }}</h5>
-                                @if($material->description)
-                                    <p class="card-text text-muted small mb-3" style="font-size: 0.85rem;">{{ Str::limit($material->description, 70) }}</p>
-                                @endif
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted" style="font-size: 0.8rem;">Oleh: {{ $material->user->name }}</small>
-                                        @if(str_contains($material->link_url, 'youtu'))
-                                            <span class="badge bg-danger"><i class="bi bi-play-circle-fill me-1"></i> Video</span>
-                                        @else
-                                            <span class="badge bg-secondary"><i class="bi bi-link-45deg me-1"></i> Link</span>
-                                        @endif
-                                    </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @foreach($learningMaterials as $material)
+                <div class="col">
+                    <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="material-card h-100 d-flex flex-column text-decoration-none">
+                        <img src="{{ $material->thumbnail_url ?? asset('images/default-material.jpg') }}" class="card-img-top material-card-img" alt="Thumbnail {{ $material->title }}">
+                        <div class="card-body d-flex flex-column p-3">
+                            <h5 class="card-title fw-bold mb-2 text-dark" style="font-size: 1rem;">{{ Str::limit($material->title, 45) }}</h5>
+                            @if($material->description)
+                                <p class="card-text text-muted small mb-3" style="font-size: 0.85rem;">{{ Str::limit($material->description, 70) }}</p>
+                            @endif
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" style="font-size: 0.8rem;">Oleh: {{ $material->user->name }}</small>
+                                    @if(str_contains($material->link_url, 'youtu'))
+                                        <span class="badge bg-danger"><i class="bi bi-play-circle-fill me-1"></i> Video</span>
+                                    @else
+                                        <span class="badge bg-secondary"><i class="bi bi-link-45deg me-1"></i> Link</span>
+                                    @endif
                                 </div>
                             </div>
-                        </a>
+                        </div>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ route('catalog.materials.all') }}" class="btn btn-outline-danger"><i class="bi bi-collection-fill me-2"></i> Lihat Semua Materi Belajar</a>
+        </div>
+    </div>
+    @endif
+
+    {{-- Peringkat Peminjam --}}
+    @if(isset($topBorrowers) && $topBorrowers->count() > 0)
+    <section class="top-borrowers-section mt-5 py-5" data-aos="fade-up">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-6">{{ $semesterTitle ?? 'Peminjam Teratas' }}</h2>
+                <div class="h-1 w-20 bg-red-500 mx-auto mt-2 mb-4 rounded"></div>
+                <p class="lead text-muted">Apresiasi bagi para penikmat koleksi kami.</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                @foreach ($topBorrowers as $borrower)
+                    @php
+                        $rankClass = '';
+                        $rankIcon = '';
+
+                        if ($loop->iteration == 1) {
+                            $rankClass = 'rank-1'; // Emas
+                            $rankIcon = '<i class="bi bi-trophy-fill text-warning"></i>';
+                        } elseif ($loop->iteration == 2) {
+                            $rankClass = 'rank-2'; // Perak
+                            $rankIcon = '2';
+                        } elseif ($loop->iteration == 3) {
+                            $rankClass = 'rank-3'; // Perunggu
+                            $rankIcon = '3';
+                        }
+                    @endphp
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card text-center h-100 shadow-sm borrower-card bg-white {{ $rankClass }}">
+                            <div class="card-body p-4 d-flex flex-column align-items-center">
+
+                                <div class="reader-avatar-container">
+                                    <div class="rank-badge">{!! $rankIcon !!}</div>
+
+                                    @if($borrower->profile_photo)
+                                        <img src="{{ asset('storage/' . $borrower->profile_photo) }}" alt="{{ $borrower->name }}" class="avatar mb-3">
+                                    @else
+                                        <div class="avatar avatar-placeholder mb-3">
+                                            {{ strtoupper(substr($borrower->name, 0, 2)) }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <h5 class="card-title fw-bold text-danger mb-1 text-truncate w-100" title="{{ $borrower->name }}">
+                                    {{ $borrower->name }}
+                                </h5>
+
+                                <div class="mb-3">
+                                    @if($borrower->role === 'siswa')
+                                        @if($borrower->class == 'Lulus')
+                                            <span class="badge bg-secondary text-uppercase tracking-wide">Alumni</span>
+                                        @elseif(!empty($borrower->class) && !empty($borrower->major))
+                                            <span class="text-muted small">{{ $borrower->class }} {{ $borrower->major }}</span>
+                                        @elseif(!empty($borrower->class_name))
+                                            <span class="text-muted small">{{ $borrower->class_name }}</span>
+                                        @else
+                                            <span class="text-muted small fst-italic">Siswa Aktif</span>
+                                        @endif
+                                    @elseif($borrower->role === 'guru')
+                                        <span class="badge bg-info text-dark">Guru</span>
+                                    @else
+                                        <span class="text-muted small">Anggota</span>
+                                    @endif
+                                </div>
+
+                                <div class="stats w-100 border-top pt-3 mt-auto">
+                                    <div>
+                                        <div class="fw-bolder fs-3 text-primary lh-1">{{ $borrower->borrowings_count }}</div>
+                                        <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Buku Dipinjam</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 @endforeach
             </div>
-            <div class="text-center mt-5">
-                <a href="{{ route('catalog.materials.all') }}" class="btn btn-outline-danger"><i class="bi bi-collection-fill me-2"></i> Lihat Semua Materi Belajar</a>
-            </div>
         </div>
-        @endif
+    </section>
+    @endif
 
-        {{-- Peringkat Peminjam --}}
-        @if(isset($topBorrowers) && $topBorrowers->count() > 0)
-        <section class="top-borrowers-section mt-5 py-5" data-aos="fade-up">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold display-6">{{ $semesterTitle ?? 'Peminjam Teratas' }}</h2>
-                    <div class="h-1 w-20 bg-red-500 mx-auto mt-2 mb-4 rounded"></div>
-                    <p class="lead text-muted">Apresiasi bagi para penikmat koleksi kami.</p>
-                </div>
-
-                <div class="row g-4 justify-content-center">
-                    @foreach ($topBorrowers as $borrower)
-                        @php
-                            $rankClass = '';
-                            $rankIcon = '';
-
-                            if ($loop->iteration == 1) {
-                                $rankClass = 'rank-1'; // Emas
-                                $rankIcon = '<i class="bi bi-trophy-fill text-warning"></i>';
-                            } elseif ($loop->iteration == 2) {
-                                $rankClass = 'rank-2'; // Perak
-                                $rankIcon = '2';
-                            } elseif ($loop->iteration == 3) {
-                                $rankClass = 'rank-3'; // Perunggu
-                                $rankIcon = '3';
-                            }
-                        @endphp
-
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card text-center h-100 shadow-sm borrower-card bg-white {{ $rankClass }}">
-                                <div class="card-body p-4 d-flex flex-column align-items-center">
-
-                                    <div class="reader-avatar-container">
-                                        <div class="rank-badge">{!! $rankIcon !!}</div>
-
-                                        @if($borrower->profile_photo)
-                                            <img src="{{ asset('storage/' . $borrower->profile_photo) }}" alt="{{ $borrower->name }}" class="avatar mb-3">
-                                        @else
-                                            <div class="avatar avatar-placeholder mb-3">
-                                                {{ strtoupper(substr($borrower->name, 0, 2)) }}
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    <h5 class="card-title fw-bold text-danger mb-1 text-truncate w-100" title="{{ $borrower->name }}">
-                                        {{ $borrower->name }}
-                                    </h5>
-
-                                    <div class="mb-3">
-                                        @if($borrower->role === 'siswa')
-                                            @if($borrower->class == 'Lulus')
-                                                <span class="badge bg-secondary text-uppercase tracking-wide">Alumni</span>
-                                            @elseif(!empty($borrower->class) && !empty($borrower->major))
-                                                <span class="text-muted small">{{ $borrower->class }} {{ $borrower->major }}</span>
-                                            @elseif(!empty($borrower->class_name))
-                                                <span class="text-muted small">{{ $borrower->class_name }}</span>
-                                            @else
-                                                <span class="text-muted small fst-italic">Siswa Aktif</span>
-                                            @endif
-                                        @elseif($borrower->role === 'guru')
-                                            <span class="badge bg-info text-dark">Guru</span>
-                                        @else
-                                            <span class="text-muted small">Anggota</span>
-                                        @endif
-                                    </div>
-
-                                    <div class="stats w-100 border-top pt-3 mt-auto">
-                                        <div>
-                                            <div class="fw-bolder fs-3 text-primary lh-1">{{ $borrower->borrowings_count }}</div>
-                                            <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Buku Dipinjam</div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+    {{-- FOOTER INFO --}}
+    <div class="bg-white py-5 mt-5 shadow-sm">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="fw-bold display-6">TENTANG KAMI</h2>
             </div>
-        </section>
-        @endif
-
-        {{-- FOOTER INFO --}}
-        <div class="bg-white py-5 mt-5 shadow-sm">
-            <div class="container">
-                <div class="text-center mb-5" data-aos="fade-up">
-                    <h2 class="fw-bold display-6">TENTANG KAMI</h2>
-                </div>
-                <div class="row" data-aos="fade-up" data-aos-delay="100">
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.691893162832!2d106.81866667499214!3d-6.433608393557545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ea2635732523%3A0x20126f5d1f77c9b0!2sSMK%20Multicomp%20Depok!5e0!3m2!1sid!2sid!4v1762216376908!5m2!1sid!2sid" style="border:0; width: 100%; min-height: 450px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                        </div>
-                    <div class="col-lg-6">
-                        <div class="info-block d-flex align-items-start mb-4">
-                            <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                            <div class="info-text"><h4 class="info-title">Alamat</h4><p>Jl. Raya Kalimulya, Kp. Kebun Duren, No.7, Kel. Kalimulya, Kec. Cilodong, Depok, Jawa Barat, Indonesia.<br>Kode Pos: 16413</p></div>
-                        </div>
-                        <div class="info-block d-flex align-items-start mb-4">
-                            <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
-                            <div class="info-text"><h4 class="info-title">Email</h4><p>smk_multikomp@yahoo.co.id</p></div>
-                        </div>
-                        <div class="info-block d-flex align-items-start mb-4">
-                            <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
-                            <div class="info-text"><h4 class="info-title">Telepon</h4><p>Tlp. (021) 77823607</p></div>
-                        </div>
-                        <div class="info-block d-flex align-items-start mb-4">
-                            <div class="info-icon"><i class="bi bi-clock-fill"></i></div>
-                            <div class="info-text"><h4 class="info-title">Jam Buka Perpustakaan</h4><p>Senin - Jumat = 08:00-14:00 WIB</div>
-                        </div>
+            <div class="row" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.691893162832!2d106.81866667499214!3d-6.433608393557545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ea2635732523%3A0x20126f5d1f77c9b0!2sSMK%20Multicomp%20Depok!5e0!3m2!1sid!2sid!4v1762216376908!5m2!1sid!2sid" style="border:0; width: 100%; min-height: 450px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                <div class="col-lg-6">
+                    <div class="info-block d-flex align-items-start mb-4">
+                        <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div class="info-text"><h4 class="info-title">Alamat</h4><p>Jl. Raya Kalimulya, Kp. Kebun Duren, No.7, Kel. Kalimulya, Kec. Cilodong, Depok, Jawa Barat, Indonesia.<br>Kode Pos: 16413</p></div>
+                    </div>
+                    <div class="info-block d-flex align-items-start mb-4">
+                        <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
+                        <div class="info-text"><h4 class="info-title">Email</h4><p>smk_multikomp@yahoo.co.id</p></div>
+                    </div>
+                    <div class="info-block d-flex align-items-start mb-4">
+                        <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div class="info-text"><h4 class="info-title">Telepon</h4><p>Tlp. (021) 77823607</p></div>
+                    </div>
+                    <div class="info-block d-flex align-items-start mb-4">
+                        <div class="info-icon"><i class="bi bi-clock-fill"></i></div>
+                        <div class="info-text"><h4 class="info-title">Jam Buka Perpustakaan</h4><p>Senin - Jumat = 08:00-14:00 WIB</div>
                     </div>
                 </div>
-                <h4 class="text-center fw-bold mt-5 text-muted" data-aos="fade-up" data-aos-delay="200" style="font-size: 1.1rem; letter-spacing: 1px;">UPT PERPUSTAKAAN MULTICOMP</h4>
             </div>
+            <h4 class="text-center fw-bold mt-5 text-muted" data-aos="fade-up" data-aos-delay="200" style="font-size: 1.1rem; letter-spacing: 1px;">UPT PERPUSTAKAAN MULTICOMP</h4>
         </div>
-    </main>
+    </div>
+@endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({ duration: 800, once: true, offset: 100 });
     </script>
-
-    @include('layouts.footer')
-</body>
-</html>
+@endpush

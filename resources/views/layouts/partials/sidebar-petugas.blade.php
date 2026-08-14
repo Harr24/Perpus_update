@@ -1,10 +1,9 @@
 <aside class="w-full bg-white border-r border-gray-100 flex flex-col sticky top-0" style="height: 100vh; height: 100dvh;">
 
-    {{-- Header Sidebar (FIXED) --}}
-    <div class="h-24 flex items-center px-8 shrink-0">
-        <h1 class="text-xl font-extrabold tracking-tight text-emerald-900 uppercase">
-            Petugas.
-        </h1>
+    {{-- Header Sidebar --}}
+    <div class="h-24 flex items-center px-8 shrink-0 border-b border-gray-50 bg-white z-10">
+        {{-- Tempat Logo Saja --}}
+        <img src="{{ asset('images/MCP.jpg') }}" alt="Logo Multicomp" class="h-12 w-auto object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300">
     </div>
 
     {{-- Menu Navigasi --}}

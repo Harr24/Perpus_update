@@ -2,7 +2,12 @@
 
 @section('content')
     <div class="mb-6">
-        <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Halo, {{ strtok(Auth::user()->name, " ") }}! 👋</h2>
+        <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+            Halo, {{ strtok(Auth::user()->name, " ") }}!
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-amber-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.472l.02-.02c.415-.414.647-.976.647-1.561a2.25 2.25 0 00-2.25-2.25c-.414 0-.822.11-1.185.319m-4.965 3.065a2.25 2.25 0 00-4.5 0" />
+            </svg>
+        </h2>
         <p class="text-gray-500 mt-1 font-medium">Selamat datang di perpustakaan digital. Mau baca buku apa hari ini?</p>
     </div>
 
@@ -12,7 +17,9 @@
         {{-- KIRI: WIDGET 10 BUKU FAVORIT --}}
         <div class="lg:col-span-2 bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-6 flex flex-col overflow-hidden">
             <div class="flex items-center gap-2 mb-4">
-                <span class="text-xl text-rose-500">❤️</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-rose-500">
+                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                </svg>
                 <h3 class="font-extrabold text-gray-900 text-lg">Buku Terpopuler</h3>
             </div>
 
@@ -57,7 +64,10 @@
                 </div>
             @else
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    <span class="text-3xl block mb-2 opacity-50">📚</span>
+                    {{-- Icon: books/rectangle-stack (pengganti emoji 📚) --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-2 text-gray-400 opacity-50">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0118 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 004.5 9v.878m13.5-3A2.25 2.25 0 0119.5 9v.878m0 0a2.246 2.246 0 00-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0121 12v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6c0-.98.626-1.813 1.5-2.122" />
+                    </svg>
                     <p class="text-gray-500 text-xs font-medium">Belum ada data buku favorit saat ini.</p>
                 </div>
             @endif
@@ -69,7 +79,10 @@
                 <div class="bg-white rounded-[1.5rem] shadow-sm p-6 border border-gray-100 flex-1 flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">📖</span>
+                            {{-- Icon: book-open (pengganti emoji 📖) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-indigo-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                            </svg>
                             <h3 class="font-extrabold text-gray-900 text-lg">Sedang Dipinjam</h3>
                         </div>
                         <span class="bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-lg text-xs font-bold">
@@ -113,7 +126,10 @@
             @else
                 <div class="bg-white rounded-[1.5rem] shadow-sm p-6 border border-gray-100 flex-1 flex flex-col justify-center">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="text-xl">💡</span>
+                        {{-- Icon: light-bulb (pengganti emoji 💡) --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-amber-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                        </svg>
                         <h3 class="font-extrabold text-gray-900 text-lg">Kutipan Hari Ini</h3>
                     </div>
                     <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-xl mb-4">
@@ -149,23 +165,32 @@
     {{-- BARIS 3: INFORMASI PENTING --}}
     <div class="bg-white rounded-[1.5rem] shadow-sm p-6 sm:p-8 border border-gray-100">
         <div class="flex items-center gap-3 mb-6">
-            <span class="text-2xl">📢</span>
+            {{-- Icon: megaphone (pengganti emoji 📢) --}}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-indigo-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+            </svg>
             <h3 class="text-lg font-extrabold text-gray-900">Informasi Penting</h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:border-indigo-100 transition flex gap-4 items-start">
-                <span class="text-2xl">🧑‍🎓</span>
+                {{-- Icon: academic-cap (pengganti emoji 🧑‍🎓) --}}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 shrink-0 text-indigo-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                </svg>
                 <div>
                     <h4 class="font-bold text-gray-900 text-sm mb-1">Update Kelas</h4>
                     <p class="text-xs text-gray-500 leading-relaxed">
-                        Jika kamu naik kelas atau pindah jurusan, kamu <strong>wajib</strong> memperbarui data kelas. Silakan edit profil di <a href="{{ route('profile.edit') }}" class="text-indigo-600 font-bold hover:underline">halaman profil</a>.
+                        Jika kamu pindah jurusan, kamu <strong>wajib</strong> memperbarui data kelas, Hubungi Admin perpustakaan <a href="{{ route('profile.edit') }}" class="text-indigo-600 font-bold hover:underline">halaman profil</a>.
                     </p>
                 </div>
             </div>
 
             <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:border-indigo-100 transition flex gap-4 items-start">
-                <span class="text-2xl">📥</span>
+                {{-- Icon: arrow-down-tray (pengganti emoji 📥) --}}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 shrink-0 text-indigo-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
                 <div>
                     <h4 class="font-bold text-gray-900 text-sm mb-1">Cara Pengembalian Buku</h4>
                     <p class="text-xs text-gray-500 leading-relaxed">

@@ -1,20 +1,10 @@
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Materi Belajar - Perpustakaan Multicomp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --brand-red: #c62828; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+@extends('layouts.public')
 
-        /* ==========================================================
-          --- REVISI: Menggunakan style 'material-card' ---
-          ==========================================================
-        */
+@section('title', 'Materi Belajar - Perpustakaan Multicomp')
+
+@push('styles')
+    <style>
+        /* Hanya sisakan CSS spesifik untuk kartu materi dan paginasi */
         .material-card {
             border: 1px solid #dee2e6;
             transition: all .2s ease-in-out;
@@ -29,70 +19,40 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
-        /* Style untuk pagination agar sesuai tema */
         .pagination .page-item.active .page-link {
             background-color: var(--brand-red);
             border-color: var(--brand-red);
-            color: white; /* Warna teks putih */
+            color: white;
         }
         .pagination .page-link {
             color: var(--brand-red);
-             box-shadow: none !important; /* Hilangkan shadow focus bootstrap */
+            box-shadow: none !important;
         }
-         .pagination .page-link:hover {
-             background-color: #f8d7da; /* Warna hover lebih lembut */
-             border-color: #f5c2c7;
-         }
-         .pagination .page-item.disabled .page-link {
-             color: #6c757d;
-             background-color: #e9ecef;
-             border-color: #dee2e6;
-         }
+        .pagination .page-link:hover {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
 
-        /* Style untuk gambar thumbnail agar pas */
-         .material-card-img {
+        .material-card-img {
             height: 200px;
-            object-fit: cover; /* Membuat gambar mengisi area tanpa distorsi */
-         }
+            object-fit: cover;
+        }
     </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold me-auto" href="{{ route('catalog.index') }}" style="color: var(--brand-red);">
-                <i class="bi bi-book-half me-2"></i> Perpustakaan Multicomp
-            </a>
+@endpush
 
-            <div class="d-flex align-items-center">
-                <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-secondary d-none d-md-flex align-items-center me-2">
-                    <i class="bi bi-house-door-fill me-1"></i>
-                    <span class="d-none d-lg-inline">Beranda</span>
-                </a>
-                 <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-secondary d-md-none me-2" aria-label="Kembali ke Beranda">
-                    <i class="bi bi-house-door-fill"></i>
-                </a>
-                {{-- Login/Dashboard Button --}}
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-danger" title="Dashboard">
-                         <i class="bi bi-grid-fill d-inline d-sm-none"></i>
-                         <span class="d-none d-sm-inline">Dashboard</span>
-                    </a>
-                @else
-                     <a href="{{ route('login') }}" class="btn btn-sm btn-danger" title="Login">
-                         <i class="bi bi-box-arrow-in-right d-inline d-sm-none"></i>
-                         <span class="d-none d-sm-inline">Login</span>
-                     </a>
-                @endauth
-            </div>
-        </div>
-    </nav>
-    <main class="container py-5">
+@section('content')
+    <div class="container py-5">
         <div class="text-center mb-5">
             <h1 class="fw-bold display-5">Materi Belajar</h1>
             <p class="lead text-muted">Akses semua materi tambahan yang dibagikan oleh para guru.</p>
         </div>
 
-        {{-- FORM PENCARIAN DAN FILTER (Tetap utuh) --}}
+        {{-- FORM PENCARIAN DAN FILTER --}}
         <div class="card card-body mb-5 shadow-sm border-0">
             <form action="{{ route('catalog.materials.all') }}" method="GET" class="row g-3 align-items-end">
                 <div class="col-md-6">
@@ -118,13 +78,11 @@
             </form>
         </div>
 
-
+        {{-- GRID MATERI --}}
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @forelse($materials as $material)
                 <div class="col">
                     <a href="{{ $material->link_url }}" target="_blank" rel="noopener noreferrer" class="material-card h-100 d-flex flex-column">
-
-                        {{-- GAMBAR THUMBNAIL BARU --}}
                         <img src="{{ $material->thumbnail_url }}" class="card-img-top material-card-img" alt="Thumbnail {{ $material->title }}">
 
                         <div class="card-body d-flex flex-column p-4">
@@ -136,14 +94,12 @@
                                 </p>
                             @endif
 
-                            {{-- Footer Kartu (Info Guru & Tipe) --}}
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         Oleh: {{ $material->user->name }}
                                     </small>
 
-                                    {{-- Badge Tipe Konten --}}
                                     @if(str_contains($material->link_url, 'youtu'))
                                         <span class="badge bg-danger">
                                             <i class="bi bi-play-circle-fill me-1"></i> Video
@@ -167,21 +123,12 @@
                 </div>
             @endforelse
         </div>
-        {{-- ========================================================== --}}
-        {{-- PENAMBAHAN: Tampilkan Link Paginasi --}}
-        {{-- ========================================================== --}}
+
+        {{-- PAGINASI --}}
         @if($materials->hasPages())
         <div class="d-flex justify-content-center mt-5">
-            {{-- Ini akan merender link pagination Bootstrap secara otomatis --}}
             {{ $materials->links() }}
         </div>
         @endif
-        {{-- ========================================================== --}}
-
-    </main>
-
-    @include('layouts.footer')
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    </div>
+@endsection
