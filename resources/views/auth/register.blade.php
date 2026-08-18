@@ -49,12 +49,19 @@
             text-align: center;
             margin-bottom: 24px;
         }
+
+        /* PERUBAHAN: Penyesuaian CSS khusus untuk Logo Gambar */
         .header .logo {
-            font-size: 3rem;
-            line-height: 1;
-            color: var(--accent);
-            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
         }
+        .header .logo img {
+            height: 70px; /* Ukuran logo disesuaikan */
+            width: auto;
+            object-fit: contain;
+        }
+
         .header h2 {
             font-weight: 600;
             font-size: 1.75rem;
@@ -113,7 +120,7 @@
         }
 
         .input-group input[type="text"],
-        .input-group input[type="number"], /* Tambahkan number */
+        .input-group input[type="number"],
         .input-group input[type="email"],
         .input-group input[type="tel"],
         .input-group input[type="password"],
@@ -248,7 +255,10 @@
     <div class="container">
 
         <div class="header">
-            <div class="logo" aria-hidden="true">📚</div>
+            {{-- PERUBAHAN: Memanggil file gambar logo menggunakan fungsi asset() --}}
+            <div class="logo">
+                <img src="{{ asset('images/MCP.jpg') }}" alt="Logo SMK Multicomp">
+            </div>
             <h2>Daftar Anggota Baru</h2>
             <p>Perpustakaan Multicomp</p>
         </div>
@@ -277,9 +287,6 @@
                     @enderror
                 </div>
 
-                {{-- ========================================================== --}}
-                {{-- 1: INPUT NISN --}}
-                {{-- ========================================================== --}}
                 <div class="input-group">
                     <label for="nis">NISN</label>
                     <input id="nis"
@@ -296,7 +303,6 @@
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
                 </div>
-                {{-- ========================================================== --}}
 
                 <div class="input-group full-width">
                     <label for="email">Alamat Email</label>
@@ -336,9 +342,6 @@
                     @enderror
                 </div>
 
-                {{-- ========================================================== --}}
-                {{-- --- INPUT WA --- --}}
-                {{-- ========================================================== --}}
                 <div class="input-group full-width">
                     <label for="phone_number">Nomor WhatsApp (Aktif)</label>
                     <input id="phone_number"
@@ -350,14 +353,11 @@
                            placeholder="Contoh: 081234567890"
                            class="@error('phone_number') is-invalid @enderror"
                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);">
-                           {{-- Script blokir huruf DAN batasi 15 angka --}}
 
                     @error('phone_number')
                         <div class="input-error-message">{{ $message }}</div>
                     @enderror
                 </div>
-                {{-- ========================================================== --}}
-
 
                 <div class="input-group full-width">
                     <label for="student_card_photo">Foto Kartu Pelajar (Untuk Verifikasi)</label>
