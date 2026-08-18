@@ -176,9 +176,7 @@
             </div>
         </div>
     </div>
-
-    {{-- Jadwal Piket --}}
-    <section class="container my-5">
+    <section id="jadwal-piket" class="container my-5 pt-5">
         <div class="row">
             <div class="col-12 text-center mb-4" data-aos="fade-up">
                 <h2 class="fw-bold display-6">Jadwal Piket Perpustakaan</h2>
@@ -345,10 +343,9 @@
         </div>
     </div>
     @endif
-
-    {{-- Peringkat Peminjam --}}
+    {{--Tambahkan id="peringkat-pembaca" di section ini  --}}
     @if(isset($topBorrowers) && $topBorrowers->count() > 0)
-    <section class="top-borrowers-section mt-5 py-5" data-aos="fade-up">
+    <section id="peringkat-pembaca" class="top-borrowers-section mt-5 py-5 pt-5" data-aos="fade-up">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="fw-bold display-6">{{ $semesterTitle ?? 'Peminjam Teratas' }}</h2>
