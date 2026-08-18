@@ -41,10 +41,7 @@ class DashboardController extends Controller
                 $data['terlambat'] = Borrowing::where('status', 'dipinjam')
                                             ->where('due_at', '<', now())
                                             ->count();
-
-                // ----------------------------------------------------------
-                // 3 GRAFIK PERTUMBUHAN ANGGOTA (Line Chart)
-                // ----------------------------------------------------------
+                //  GRAFIK PERTUMBUHAN ANGGOTA (Line Chart)
                 $currentYear = Carbon::now()->year;
 
                 // Ambil data user baru (siswa/guru) dikelompokkan per bulan tahun ini
@@ -134,6 +131,7 @@ class DashboardController extends Controller
                 $data['terlambat'] = Borrowing::where('status', 'dipinjam')
                                             ->where('due_at', '<', now())
                                             ->count();
+                $data['bukuDipinjam'] = Borrowing::where('status', 'dipinjam')->count();
 
                 // 2. DATA GRAFIK GARIS (PEMINJAMAN BULAN INI)
                 $currentMonth = Carbon::now()->month;
