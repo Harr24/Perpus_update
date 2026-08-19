@@ -29,6 +29,24 @@
             z-index: 1;
         }
         .login-header { text-align: center; margin-bottom: 35px; }
+
+        .login-header .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .login-header .logo img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+        .login-header .logo img:hover {
+            transform: scale(1.05); /* Efek membesar saat di-hover */
+        }
+
+
         .login-container h2 { color: #dc2626; font-weight: 700; font-size: 28px; margin-bottom: 8px; }
         .login-subtitle { color: #6b7280; font-size: 14px; }
         .input-group { margin-bottom: 24px; position: relative; }
@@ -86,9 +104,6 @@
             Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
         </div>
 
-        {{-- =============================================== --}}
-        {{-- Tombol Kembali ke Homepage           --}}
-        {{-- =============================================== --}}
         <div class="login-footer" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
             <a href="{{ route('catalog.index') }}">Kembali ke Homepage</a>
         </div>

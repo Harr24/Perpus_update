@@ -54,6 +54,7 @@ class BookCatalogController extends Controller
         // Top Readers (Juara Membaca)
         $now = now();
         $currentYear = $now->year;
+
         // Tentukan Semester (Jan-Jun atau Jul-Des)
         if ($now->month >= 1 && $now->month <= 6) {
             $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
@@ -65,13 +66,15 @@ class BookCatalogController extends Controller
             $semesterTitle = "Semester Ini (Jul - Des)";
         }
 
-        // Query Mencari 3 Siswa Terrajin
+        // Query Mencari 3 Siswa Terrajin (SUDAH DIPERBARUI)
         $topBorrowers = User::where('role', 'siswa') // Hanya siswa
+            ->where('account_status', 'active') // Pastikan akun siswa masih aktif
             ->withCount(['borrowings' => function($q) use ($startDate, $endDate) {
-                // Hanya hitung peminjaman di semester ini & status valid
+                // Hanya hitung peminjaman di semester ini & status valid (TIDAK pending/ditolak)
                 $q->whereBetween('created_at', [$startDate, $endDate])
-                  ->whereIn('status', ['dipinjam', 'returned']);
+                  ->whereNotIn('status', ['pending', 'ditolak']);
             }])
+            ->having('borrowings_count', '>', 0) // Cegah siswa dengan 0 pinjaman masuk peringkat
             ->orderBy('borrowings_count', 'desc') // Urutkan dari terbanyak
             ->take(3) // Ambil 3 Juara
             ->get();

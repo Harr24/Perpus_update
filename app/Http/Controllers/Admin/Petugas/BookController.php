@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookCopy;
 use App\Models\Genre;
-use App\Models\Shelf; 
+use App\Models\Shelf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +25,7 @@ class BookController extends Controller
         $search = $request->input('search');
         $genreId = $request->input('genre_id');
 
-        $query = Book::with('genre', 'shelf') 
+        $query = Book::with('genre', 'shelf')
             ->withCount([
                 'copies as copies_count' => function ($query) {
                     $query->where('status', '!=', 'hilang');
@@ -55,7 +55,7 @@ class BookController extends Controller
     public function create()
     {
         $genres = Genre::orderBy('name')->get();
-        $shelves = Shelf::orderBy('name')->get(); 
+        $shelves = Shelf::orderBy('name')->get();
         return view('admin.petugas.books.create', compact('genres', 'shelves'));
     }
 
@@ -70,7 +70,7 @@ class BookController extends Controller
             'publication_year' => 'nullable|digits:4|integer|min:1900|max:' . (date('Y')),
             'synopsis' => 'nullable|string',
             'genre_id' => 'required|exists:genres,id',
-            'shelf_id' => 'required|exists:shelves,id', 
+            'shelf_id' => 'required|exists:shelves,id',
             'initial_code' => 'required|string|max:10|alpha_num',
             'stock' => 'required|integer|min:1|max:100',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -97,7 +97,7 @@ class BookController extends Controller
                 'publication_year' => $validated['publication_year'] ?? null,
                 'synopsis' => $validated['synopsis'] ?? null,
                 'genre_id' => $validated['genre_id'],
-                'shelf_id' => $validated['shelf_id'], 
+                'shelf_id' => $validated['shelf_id'],
                 'book_type' => $validated['book_type'],
                 'stock' => $validated['stock'],
             ];
@@ -130,7 +130,7 @@ class BookController extends Controller
         // ==========================================================
         // --- 🔥 UPDATE PENTING UNTUK FITUR NAMA PEMINJAM & HILANG 🔥 ---
         // ==========================================================
-        
+
         // 1. Load data dasar
         $book->load(['genre', 'shelf']);
 
@@ -142,7 +142,7 @@ class BookController extends Controller
                 $q->latest()->limit(1)->with('user'); // Ambil 1 transaksi terakhir + user-nya
             }]);
         }]);
-        
+
         return view('admin.petugas.books.show', compact('book'));
     }
 
@@ -194,7 +194,7 @@ class BookController extends Controller
             }
 
             $updateData['book_type'] = $validated['book_type'];
-            $updateData['shelf_id'] = $validated['shelf_id']; 
+            $updateData['shelf_id'] = $validated['shelf_id'];
 
             if ($addStockAmount > 0) {
                 $updateData['stock'] = $book->stock + $addStockAmount;
@@ -309,9 +309,7 @@ class BookController extends Controller
             ->with('success', "Eksemplar {$copy->book_code} berhasil ditandai 'tersedia' dan stok telah dikembalikan.");
     }
 
-    // ==========================================================
     // METODE UNTUK FORM TAMBAH BUKU MULTI-BARIS (BULK)
-    // ==========================================================
 
     public function showCreateBulkForm()
     {
