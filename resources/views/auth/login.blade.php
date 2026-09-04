@@ -104,6 +104,10 @@
             Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
         </div>
 
+        <div class="login-footer">
+            <a href="{{ route('password.request') }}" class="text-primary text-decoration-none small">Lupa Password?</a>
+        </div>
+
         <div class="login-footer" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
             <a href="{{ route('catalog.index') }}">Kembali ke Homepage</a>
         </div>

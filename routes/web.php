@@ -42,6 +42,14 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login']);
 
+    // RUTE LUPA PASSWORD
+    Route::get('forgot-password', [App\Http\Controllers\PasswordResetController::class, 'requestForm'])->name('password.request');
+    Route::post('forgot-password', [App\Http\Controllers\PasswordResetController::class, 'sendResetLink'])->name('password.email');
+
+    // RUTE RESET PASSWORD (DARI LINK EMAIL)
+    Route::get('reset-password/{token}', [App\Http\Controllers\PasswordResetController::class, 'resetForm'])->name('password.reset');
+    Route::post('reset-password', [App\Http\Controllers\PasswordResetController::class, 'updatePassword'])->name('password.update');
+
     // RUTE SUPERADMIN
     Route::get('/portal-kendali-mcp', [AuthController::class, 'showSuperadminLogin'])->name('superadmin.login');
     Route::post('/portal-kendali-mcp', [AuthController::class, 'superadminLoginProcess'])->name('superadmin.login.process');
@@ -52,6 +60,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markasread');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('leaderboard', [DashboardController::class, 'leaderboard'])->name('leaderboard');
 
     // RUTE PROFIL
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

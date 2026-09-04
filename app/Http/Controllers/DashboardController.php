@@ -255,4 +255,42 @@ class DashboardController extends Controller
         // Kirim semua data ke view
         return view('dashboard', array_merge(['user' => $user], $data));
     }
+
+    /**
+     * Menampilkan halaman Peringkat (Gamifikasi) Khusus Siswa
+     *
+     * @return \Illuminate\View\View
+     */
+    public function leaderboard()
+    {
+        $now = now();
+        $currentYear = $now->year;
+
+        // Tentukan Semester (Jan-Jun atau Jul-Des)
+        if ($now->month >= 1 && $now->month <= 6) {
+            $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
+            $endDate = Carbon::create($currentYear, 6, 30)->endOfDay();
+            $semesterTitle = "Semester Genap (Jan - Jun " . $currentYear . ")";
+        } else {
+            $startDate = Carbon::create($currentYear, 7, 1)->startOfDay();
+            $endDate = Carbon::create($currentYear, 12, 31)->endOfDay();
+            $semesterTitle = "Semester Ganjil (Jul - Des " . $currentYear . ")";
+        }
+
+        // Query Mencari 3 Siswa Terrajin (Top Readers) Semester Ini
+        $topBorrowers = User::where('role', 'siswa')
+            ->where('account_status', 'active') // Pastikan akunnya aktif
+            ->withCount(['borrowings' => function($q) use ($startDate, $endDate) {
+                // Hanya hitung peminjaman di semester ini & status valid (TIDAK pending/ditolak)
+                $q->whereBetween('created_at', [$startDate, $endDate])
+                  ->whereNotIn('status', ['pending', 'ditolak']);
+            }])
+            ->having('borrowings_count', '>', 0) // Pastikan hanya yang pernah meminjam
+            ->orderByDesc('borrowings_count')
+            ->take(3)
+            ->get();
+
+        // Mengembalikan View ke folder 'resources/views/siswa/leaderboard.blade.php'
+        return view('siswa.leaderboard', compact('topBorrowers', 'semesterTitle'));
+    }
 }
